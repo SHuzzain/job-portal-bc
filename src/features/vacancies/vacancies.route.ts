@@ -1,0 +1,165 @@
+import { createRoute } from "@hono/zod-openapi"
+import * as HttpStatusCodes from "stoker/http-status-codes"
+import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers"
+import { requireApprovedCompany } from "../../auth/middleware.ts"
+import { createRouter } from "../../lib/create-app.ts"
+import {
+  create as createVacancy,
+  deleteVacancy,
+  get as getVacancy,
+  getMine as getMineVacancy,
+  listMine as listMineVacancies,
+  listPublic as listPublicVacancies,
+  resubmit as resubmitVacancy,
+  update as updateVacancy,
+} from "./vacancies.controller.ts"
+import {
+  createVacancyBodySchema,
+  errorMessageSchema,
+  listVacanciesQuerySchema,
+  updateVacancyBodySchema,
+  vacancyIdParamSchema,
+  vacancySchema,
+} from "./validator/vacancy.schema.ts"
+
+const error = {
+  [HttpStatusCodes.BAD_REQUEST]: jsonContent(errorMessageSchema, "Bad request"),
+  [HttpStatusCodes.UNAUTHORIZED]: jsonContent(errorMessageSchema, "Unauthorized"),
+  [HttpStatusCodes.FORBIDDEN]: jsonContent(errorMessageSchema, "Forbidden"),
+  [HttpStatusCodes.NOT_FOUND]: jsonContent(errorMessageSchema, "Not found"),
+}
+
+export const listPublicVacanciesRoute = createRoute({
+  method: "get",
+  path: "/",
+  tags: ["Vacancies"],
+  request: {
+    query: listVacanciesQuerySchema,
+  },
+  responses: {
+    [HttpStatusCodes.OK]: jsonContent(vacancySchema.array(), "Approved vacancies"),
+  },
+})
+
+export const listMineVacanciesRoute = createRoute({
+  method: "get",
+  path: "/mine",
+  tags: ["Vacancies"],
+  responses: {
+    [HttpStatusCodes.OK]: jsonContent(vacancySchema.array(), "Vacancies for the active company"),
+    [HttpStatusCodes.BAD_REQUEST]: error[HttpStatusCodes.BAD_REQUEST],
+    [HttpStatusCodes.UNAUTHORIZED]: error[HttpStatusCodes.UNAUTHORIZED],
+  },
+})
+
+export const getVacancyRoute = createRoute({
+  method: "get",
+  path: "/{id}",
+  tags: ["Vacancies"],
+  request: {
+    params: vacancyIdParamSchema,
+  },
+  responses: {
+    [HttpStatusCodes.OK]: jsonContent(vacancySchema, "Approved vacancy"),
+    [HttpStatusCodes.NOT_FOUND]: error[HttpStatusCodes.NOT_FOUND],
+  },
+})
+
+export const createVacancyRoute = createRoute({
+  method: "post",
+  path: "/",
+  tags: ["Vacancies"],
+  middleware: [requireApprovedCompany],
+  request: {
+    body: jsonContentRequired(createVacancyBodySchema, "Vacancy"),
+  },
+  responses: {
+    [HttpStatusCodes.CREATED]: jsonContent(vacancySchema, "Vacancy submitted for PASAK approval"),
+    [HttpStatusCodes.BAD_REQUEST]: error[HttpStatusCodes.BAD_REQUEST],
+    [HttpStatusCodes.UNAUTHORIZED]: error[HttpStatusCodes.UNAUTHORIZED],
+    [HttpStatusCodes.FORBIDDEN]: error[HttpStatusCodes.FORBIDDEN],
+  },
+})
+
+export const updateVacancyRoute = createRoute({
+  method: "patch",
+  path: "/{id}",
+  tags: ["Vacancies"],
+  middleware: [requireApprovedCompany],
+  request: {
+    params: vacancyIdParamSchema,
+    body: jsonContentRequired(updateVacancyBodySchema, "Vacancy fields"),
+  },
+  responses: {
+    [HttpStatusCodes.OK]: jsonContent(vacancySchema, "Updated vacancy"),
+    ...error,
+  },
+})
+
+export const getMineVacancyRoute = createRoute({
+  method: "get",
+  path: "/mine/{id}",
+  tags: ["Vacancies"],
+  request: {
+    params: vacancyIdParamSchema,
+  },
+  responses: {
+    [HttpStatusCodes.OK]: jsonContent(vacancySchema, "Vacancy owned by the active company"),
+    [HttpStatusCodes.BAD_REQUEST]: error[HttpStatusCodes.BAD_REQUEST],
+    [HttpStatusCodes.UNAUTHORIZED]: error[HttpStatusCodes.UNAUTHORIZED],
+    [HttpStatusCodes.NOT_FOUND]: error[HttpStatusCodes.NOT_FOUND],
+  },
+})
+
+export const resubmitVacancyRoute = createRoute({
+  method: "post",
+  path: "/{id}/resubmit",
+  tags: ["Vacancies"],
+  middleware: [requireApprovedCompany],
+  request: {
+    params: vacancyIdParamSchema,
+  },
+  responses: {
+    [HttpStatusCodes.OK]: jsonContent(vacancySchema, "Vacancy resubmitted for PASAK review"),
+    ...error,
+  },
+})
+
+export const deleteVacancyRoute = createRoute({
+  method: "delete",
+  path: "/{id}",
+  tags: ["Vacancies"],
+  middleware: [requireApprovedCompany],
+  request: {
+    params: vacancyIdParamSchema,
+  },
+  responses: {
+    [HttpStatusCodes.NO_CONTENT]: {
+      description: "Deleted",
+    },
+    [HttpStatusCodes.UNAUTHORIZED]: error[HttpStatusCodes.UNAUTHORIZED],
+    [HttpStatusCodes.FORBIDDEN]: error[HttpStatusCodes.FORBIDDEN],
+    [HttpStatusCodes.NOT_FOUND]: error[HttpStatusCodes.NOT_FOUND],
+  },
+})
+
+export type ListPublicVacanciesRoute = typeof listPublicVacanciesRoute
+export type ListMineVacanciesRoute = typeof listMineVacanciesRoute
+export type GetVacancyRoute = typeof getVacancyRoute
+export type CreateVacancyRoute = typeof createVacancyRoute
+export type UpdateVacancyRoute = typeof updateVacancyRoute
+export type GetMineVacancyRoute = typeof getMineVacancyRoute
+export type ResubmitVacancyRoute = typeof resubmitVacancyRoute
+export type DeleteVacancyRoute = typeof deleteVacancyRoute
+
+const vacancies = createRouter()
+  .openapi(listPublicVacanciesRoute, listPublicVacancies)
+  .openapi(listMineVacanciesRoute, listMineVacancies)
+  .openapi(getMineVacancyRoute, getMineVacancy)
+  .openapi(createVacancyRoute, createVacancy)
+  .openapi(resubmitVacancyRoute, resubmitVacancy)
+  .openapi(getVacancyRoute, getVacancy)
+  .openapi(updateVacancyRoute, updateVacancy)
+  .openapi(deleteVacancyRoute, deleteVacancy)
+
+export default vacancies

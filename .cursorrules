@@ -1,0 +1,23 @@
+# Talent Perak 2.0 - Hono API rules
+
+## Stack
+- Hono + `@hono/zod-openapi` + Drizzle PostgreSQL.
+- Better Auth via `drizzleAdapter` (never a raw `pool` as `database`).
+- Auth HTTP is only `app.all("/api/auth/*", (c) => auth.handler(c.req.raw))`.
+
+## Auth plugins
+Enable: `admin`, `organization` (with `ac` Role objects, not string arrays), `customSession`, `bearer`, `openAPI`, optional `genericOAuth` (MyDigital ID).
+Do NOT add `user.additionalFields.role` — the admin plugin owns `user.role`.
+Do NOT add a static `support` role. Admins create named roles with `organization.createRole` and `page` permissions.
+`createAccessControl` is a helper, not a plugin.
+
+## Layout
+- `src/auth/`: instance, middleware, plugins, access catalogs.
+- `src/db/`: connection, schema barrel, relations, migrations. No feature dumps.
+- `src/features/<name>/`: `*.route.ts`, `*.controller.ts`, `*.service.ts`, `*.repository.ts`, `validator/`.
+
+## SRS
+- New orgs: `status` default `PENDING_APPROVAL`. Use `requireApprovedCompany` on vacancy/applicant writes.
+- Vacancies (Phase 4+): start `PENDING_APPROVAL`.
+- TVET: `hasTvetCapability`, not a separate account type.
+- CORS + `trustedOrigins` must include `FRONTEND_URL` with `credentials: true`.
