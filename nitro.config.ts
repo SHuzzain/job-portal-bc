@@ -10,6 +10,9 @@ const config = {
     dirs: ["src/workflows"],
     typescriptPlugin: true,
   },
+  devServer: {
+    port: Number(process.env.PORT ?? 3001),
+  },
 }
 
 export default defineConfig(config)
