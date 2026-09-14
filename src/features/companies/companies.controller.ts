@@ -1,14 +1,12 @@
 import * as HttpStatusCodes from "stoker/http-status-codes"
+import { authedSession } from "../../lib/session.ts"
 import type { AppRouteHandler } from "../../lib/types.ts"
 import type { ResubmitCompanyRoute } from "./companies.route.ts"
 import { CompanyError } from "./companies.service.ts"
 import * as companiesService from "./companies.service.ts"
 
 export const resubmitCompany: AppRouteHandler<ResubmitCompanyRoute> = async (c) => {
-  const session = c.get("session")
-  if (!session) {
-    return c.json({ message: "Unauthorized" }, HttpStatusCodes.UNAUTHORIZED)
-  }
+  const session = authedSession(c)
 
   try {
     const { id } = c.req.valid("param")

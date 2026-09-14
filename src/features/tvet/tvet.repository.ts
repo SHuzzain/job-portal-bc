@@ -1,61 +1,87 @@
-import { and, eq } from "drizzle-orm"
-import { db } from "../../db/index.ts"
-import { tvetAttendance, tvetRfp, tvetSession } from "./tvet.schema.ts"
+import { and, eq, isNull } from "drizzle-orm";
+import { organization } from "../../auth/schema.ts";
+import { db } from "../../db/index.ts";
+import { user } from "../users/users.schema.ts";
+import { tvetAttendance, tvetRfp, tvetSession } from "./tvet.schema.ts";
 
 export type CreateRfpRecord = {
-  id: string
-  organizationId: string
-  title: string
-  description: string
-  status: string
-}
+  id: string;
+  organizationId: string;
+  title: string;
+  description: string;
+  status: string;
+};
 
-export type UpdateRfpRecord = Partial<Pick<CreateRfpRecord, "title" | "description" | "status">>
+export type UpdateRfpRecord = Partial<
+  Pick<CreateRfpRecord, "title" | "description" | "status">
+>;
 
 export type CreateSessionRecord = {
-  id: string
-  rfpId: string
-  organizationId: string
-  title: string
-  venue: string
-  startsAt: string
-  endsAt: string
-  barcode: string
-}
+  id: string;
+  rfpId: string;
+  organizationId: string;
+  title: string;
+  venue: string;
+  startsAt: string;
+  endsAt: string;
+  barcode: string;
+};
 
 export type CreateAttendanceRecord = {
-  id: string
-  sessionId: string
-  userId: string
-}
+  id: string;
+  sessionId: string;
+  userId: string;
+};
+
+export type CompleteSurveyRecord = {
+  surveyCompletedAt: Date;
+  certificateCode: string;
+  surveyRating: number;
+  surveyFeedback: string | null;
+};
 
 export async function insertRfp(data: CreateRfpRecord) {
-  const [row] = await db.insert(tvetRfp).values(data).returning()
-  return row ?? null
+  const [row] = await db.insert(tvetRfp).values(data).returning();
+  return row ?? null;
 }
 
 export async function findRfpById(id: string) {
-  const [row] = await db.select().from(tvetRfp).where(eq(tvetRfp.id, id)).limit(1)
-  return row ?? null
+  const [row] = await db
+    .select()
+    .from(tvetRfp)
+    .where(eq(tvetRfp.id, id))
+    .limit(1);
+  return row ?? null;
 }
 
 export async function listRfpsByOrganization(organizationId: string) {
-  return db.select().from(tvetRfp).where(eq(tvetRfp.organizationId, organizationId))
+  return db
+    .select()
+    .from(tvetRfp)
+    .where(eq(tvetRfp.organizationId, organizationId));
 }
 
 export async function updateRfpById(id: string, data: UpdateRfpRecord) {
-  const [row] = await db.update(tvetRfp).set(data).where(eq(tvetRfp.id, id)).returning()
-  return row ?? null
+  const [row] = await db
+    .update(tvetRfp)
+    .set(data)
+    .where(eq(tvetRfp.id, id))
+    .returning();
+  return row ?? null;
 }
 
 export async function insertSession(data: CreateSessionRecord) {
-  const [row] = await db.insert(tvetSession).values(data).returning()
-  return row ?? null
+  const [row] = await db.insert(tvetSession).values(data).returning();
+  return row ?? null;
 }
 
 export async function findSessionById(id: string) {
-  const [row] = await db.select().from(tvetSession).where(eq(tvetSession.id, id)).limit(1)
-  return row ?? null
+  const [row] = await db
+    .select()
+    .from(tvetSession)
+    .where(eq(tvetSession.id, id))
+    .limit(1);
+  return row ?? null;
 }
 
 export async function findSessionByBarcode(barcode: string) {
@@ -63,38 +89,105 @@ export async function findSessionByBarcode(barcode: string) {
     .select()
     .from(tvetSession)
     .where(eq(tvetSession.barcode, barcode))
-    .limit(1)
-  return row ?? null
+    .limit(1);
+  return row ?? null;
 }
 
-export async function listSessionsByOrganization(organizationId: string, rfpId?: string) {
+export async function listSessionsByOrganization(
+  organizationId: string,
+  rfpId?: string,
+) {
   if (rfpId) {
     return db
       .select()
       .from(tvetSession)
-      .where(and(eq(tvetSession.organizationId, organizationId), eq(tvetSession.rfpId, rfpId)))
+      .where(
+        and(
+          eq(tvetSession.organizationId, organizationId),
+          eq(tvetSession.rfpId, rfpId),
+        ),
+      );
   }
-  return db.select().from(tvetSession).where(eq(tvetSession.organizationId, organizationId))
+  return db
+    .select()
+    .from(tvetSession)
+    .where(eq(tvetSession.organizationId, organizationId));
 }
 
 export async function insertAttendance(data: CreateAttendanceRecord) {
-  const [row] = await db.insert(tvetAttendance).values(data).returning()
-  return row ?? null
+  const [row] = await db.insert(tvetAttendance).values(data).returning();
+  return row ?? null;
 }
 
 export async function findAttendance(sessionId: string, userId: string) {
   const [row] = await db
     .select()
     .from(tvetAttendance)
-    .where(and(eq(tvetAttendance.sessionId, sessionId), eq(tvetAttendance.userId, userId)))
-    .limit(1)
-  return row ?? null
+    .where(
+      and(
+        eq(tvetAttendance.sessionId, sessionId),
+        eq(tvetAttendance.userId, userId),
+      ),
+    )
+    .limit(1);
+  return row ?? null;
+}
+
+export async function completeSurvey(
+  sessionId: string,
+  userId: string,
+  data: CompleteSurveyRecord,
+) {
+  const [row] = await db
+    .update(tvetAttendance)
+    .set(data)
+    .where(
+      and(
+        eq(tvetAttendance.sessionId, sessionId),
+        eq(tvetAttendance.userId, userId),
+        isNull(tvetAttendance.surveyCompletedAt),
+      ),
+    )
+    .returning();
+  return row ?? null;
+}
+
+export async function findCertificate(sessionId: string, userId: string) {
+  const [row] = await db
+    .select({
+      attendance: tvetAttendance,
+      session: tvetSession,
+      recipientName: user.name,
+      providerName: organization.name,
+    })
+    .from(tvetAttendance)
+    .innerJoin(tvetSession, eq(tvetAttendance.sessionId, tvetSession.id))
+    .innerJoin(user, eq(tvetAttendance.userId, user.id))
+    .innerJoin(organization, eq(tvetSession.organizationId, organization.id))
+    .where(
+      and(
+        eq(tvetAttendance.sessionId, sessionId),
+        eq(tvetAttendance.userId, userId),
+      ),
+    )
+    .limit(1);
+  return row ?? null;
 }
 
 export async function listAttendanceBySession(sessionId: string) {
-  return db.select().from(tvetAttendance).where(eq(tvetAttendance.sessionId, sessionId))
+  return db
+    .select()
+    .from(tvetAttendance)
+    .where(eq(tvetAttendance.sessionId, sessionId));
 }
 
 export async function listAttendanceByUser(userId: string) {
-  return db.select().from(tvetAttendance).where(eq(tvetAttendance.userId, userId))
+  return db
+    .select({
+      attendance: tvetAttendance,
+      sessionTitle: tvetSession.title,
+    })
+    .from(tvetAttendance)
+    .innerJoin(tvetSession, eq(tvetAttendance.sessionId, tvetSession.id))
+    .where(eq(tvetAttendance.userId, userId));
 }

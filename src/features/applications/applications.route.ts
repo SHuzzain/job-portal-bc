@@ -3,6 +3,7 @@ import * as HttpStatusCodes from "stoker/http-status-codes"
 import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers"
 import { requireApprovedCompany, requireJobseeker } from "../../auth/middleware.ts"
 import { createRouter } from "../../lib/create-app.ts"
+import { errorResponses } from "../../lib/http-errors.ts"
 import {
   create as createApplication,
   followUp,
@@ -15,18 +16,9 @@ import {
   applicationIdParamSchema,
   applicationSchema,
   createApplicationBodySchema,
-  errorMessageSchema,
   setApplicationStatusBodySchema,
   vacancyIdParamSchema,
 } from "./validator/application.schema.ts"
-
-const error = {
-  [HttpStatusCodes.BAD_REQUEST]: jsonContent(errorMessageSchema, "Bad request"),
-  [HttpStatusCodes.UNAUTHORIZED]: jsonContent(errorMessageSchema, "Unauthorized"),
-  [HttpStatusCodes.FORBIDDEN]: jsonContent(errorMessageSchema, "Forbidden"),
-  [HttpStatusCodes.NOT_FOUND]: jsonContent(errorMessageSchema, "Not found"),
-  [HttpStatusCodes.CONFLICT]: jsonContent(errorMessageSchema, "Conflict"),
-}
 
 export const createApplicationRoute = createRoute({
   method: "post",
@@ -38,7 +30,7 @@ export const createApplicationRoute = createRoute({
   },
   responses: {
     [HttpStatusCodes.CREATED]: jsonContent(applicationSchema, "Application submitted"),
-    ...error,
+    ...errorResponses,
   },
 })
 
@@ -49,7 +41,7 @@ export const listMineRoute = createRoute({
   middleware: [requireJobseeker],
   responses: {
     [HttpStatusCodes.OK]: jsonContent(applicationSchema.array(), "My applications"),
-    ...error,
+    ...errorResponses,
   },
 })
 
@@ -63,7 +55,7 @@ export const listForVacancyRoute = createRoute({
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(applicationSchema.array(), "Applicants for a company vacancy"),
-    ...error,
+    ...errorResponses,
   },
 })
 
@@ -76,7 +68,7 @@ export const getApplicationRoute = createRoute({
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(applicationSchema, "Application"),
-    ...error,
+    ...errorResponses,
   },
 })
 
@@ -91,7 +83,7 @@ export const setStatusRoute = createRoute({
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(applicationSchema, "Updated application"),
-    ...error,
+    ...errorResponses,
   },
 })
 
@@ -105,7 +97,7 @@ export const followUpRoute = createRoute({
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(applicationSchema, "Follow-up sent"),
-    ...error,
+    ...errorResponses,
   },
 })
 

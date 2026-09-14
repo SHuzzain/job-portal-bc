@@ -43,7 +43,8 @@ export const auth = betterAuth({
     user: {
       create: {
         before: async (user, ctx) => {
-          const requested = (ctx?.body as { role?: unknown } | undefined)?.role
+          const requested = (ctx?.body as { accountType?: unknown } | undefined)
+            ?.accountType
           if (typeof requested === "string" && signupRoles.has(requested)) {
             return { data: { ...user, role: requested } }
           }

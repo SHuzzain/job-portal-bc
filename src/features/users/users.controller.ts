@@ -1,4 +1,5 @@
 import * as HttpStatusCodes from "stoker/http-status-codes"
+import { authedSession } from "../../lib/session.ts"
 import type { AppRouteHandler } from "../../lib/types.ts"
 import type { UpdateMeRoute, UpdatePhoneRoute } from "./users.route.ts"
 import * as usersService from "./users.service.ts"
@@ -20,10 +21,7 @@ function toProfile(user: {
 }
 
 export const updateMe: AppRouteHandler<UpdateMeRoute> = async (c) => {
-    const session = c.get("session")
-    if (!session) {
-      return c.json({ message: "Unauthorized" }, HttpStatusCodes.UNAUTHORIZED)
-    }
+    const session = authedSession(c)
 
     const body = c.req.valid("json")
     const user = await usersService.updateProfile(session.user.id, body)
@@ -35,10 +33,7 @@ export const updateMe: AppRouteHandler<UpdateMeRoute> = async (c) => {
   }
 
 export const updatePhone: AppRouteHandler<UpdatePhoneRoute> = async (c) => {
-    const session = c.get("session")
-    if (!session) {
-      return c.json({ message: "Unauthorized" }, HttpStatusCodes.UNAUTHORIZED)
-    }
+    const session = authedSession(c)
 
     const { phoneNumber } = c.req.valid("json")
     const user = await usersService.updatePhone(session.user.id, phoneNumber)

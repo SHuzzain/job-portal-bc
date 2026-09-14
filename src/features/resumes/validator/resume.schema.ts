@@ -22,5 +22,3 @@ export const resumeIdParamSchema = z
     id: z.string().min(1),
   })
   .openapi("ResumeIdParam")
-
-export const errorMessageSchema = z.object({ message: z.string() }).openapi("ResumeError")

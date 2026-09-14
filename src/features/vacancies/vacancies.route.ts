@@ -1,8 +1,9 @@
 import { createRoute } from "@hono/zod-openapi"
 import * as HttpStatusCodes from "stoker/http-status-codes"
 import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers"
-import { requireApprovedCompany } from "../../auth/middleware.ts"
+import { requireActiveCompany, requireApprovedCompany } from "../../auth/middleware.ts"
 import { createRouter } from "../../lib/create-app.ts"
+import { errorResponses, jsonErrors } from "../../lib/http-errors.ts"
 import {
   create as createVacancy,
   deleteVacancy,
@@ -15,19 +16,11 @@ import {
 } from "./vacancies.controller.ts"
 import {
   createVacancyBodySchema,
-  errorMessageSchema,
   listVacanciesQuerySchema,
   updateVacancyBodySchema,
   vacancyIdParamSchema,
   vacancySchema,
 } from "./validator/vacancy.schema.ts"
-
-const error = {
-  [HttpStatusCodes.BAD_REQUEST]: jsonContent(errorMessageSchema, "Bad request"),
-  [HttpStatusCodes.UNAUTHORIZED]: jsonContent(errorMessageSchema, "Unauthorized"),
-  [HttpStatusCodes.FORBIDDEN]: jsonContent(errorMessageSchema, "Forbidden"),
-  [HttpStatusCodes.NOT_FOUND]: jsonContent(errorMessageSchema, "Not found"),
-}
 
 export const listPublicVacanciesRoute = createRoute({
   method: "get",
@@ -45,10 +38,10 @@ export const listMineVacanciesRoute = createRoute({
   method: "get",
   path: "/mine",
   tags: ["Vacancies"],
+  middleware: [requireActiveCompany],
   responses: {
     [HttpStatusCodes.OK]: jsonContent(vacancySchema.array(), "Vacancies for the active company"),
-    [HttpStatusCodes.BAD_REQUEST]: error[HttpStatusCodes.BAD_REQUEST],
-    [HttpStatusCodes.UNAUTHORIZED]: error[HttpStatusCodes.UNAUTHORIZED],
+    ...jsonErrors(HttpStatusCodes.BAD_REQUEST, HttpStatusCodes.UNAUTHORIZED),
   },
 })
 
@@ -61,7 +54,7 @@ export const getVacancyRoute = createRoute({
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(vacancySchema, "Approved vacancy"),
-    [HttpStatusCodes.NOT_FOUND]: error[HttpStatusCodes.NOT_FOUND],
+    ...jsonErrors(HttpStatusCodes.NOT_FOUND),
   },
 })
 
@@ -75,9 +68,11 @@ export const createVacancyRoute = createRoute({
   },
   responses: {
     [HttpStatusCodes.CREATED]: jsonContent(vacancySchema, "Vacancy submitted for PASAK approval"),
-    [HttpStatusCodes.BAD_REQUEST]: error[HttpStatusCodes.BAD_REQUEST],
-    [HttpStatusCodes.UNAUTHORIZED]: error[HttpStatusCodes.UNAUTHORIZED],
-    [HttpStatusCodes.FORBIDDEN]: error[HttpStatusCodes.FORBIDDEN],
+    ...jsonErrors(
+      HttpStatusCodes.BAD_REQUEST,
+      HttpStatusCodes.UNAUTHORIZED,
+      HttpStatusCodes.FORBIDDEN,
+    ),
   },
 })
 
@@ -92,7 +87,7 @@ export const updateVacancyRoute = createRoute({
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(vacancySchema, "Updated vacancy"),
-    ...error,
+    ...errorResponses,
   },
 })
 
@@ -100,14 +95,17 @@ export const getMineVacancyRoute = createRoute({
   method: "get",
   path: "/mine/{id}",
   tags: ["Vacancies"],
+  middleware: [requireActiveCompany],
   request: {
     params: vacancyIdParamSchema,
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(vacancySchema, "Vacancy owned by the active company"),
-    [HttpStatusCodes.BAD_REQUEST]: error[HttpStatusCodes.BAD_REQUEST],
-    [HttpStatusCodes.UNAUTHORIZED]: error[HttpStatusCodes.UNAUTHORIZED],
-    [HttpStatusCodes.NOT_FOUND]: error[HttpStatusCodes.NOT_FOUND],
+    ...jsonErrors(
+      HttpStatusCodes.BAD_REQUEST,
+      HttpStatusCodes.UNAUTHORIZED,
+      HttpStatusCodes.NOT_FOUND,
+    ),
   },
 })
 
@@ -121,7 +119,7 @@ export const resubmitVacancyRoute = createRoute({
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(vacancySchema, "Vacancy resubmitted for PASAK review"),
-    ...error,
+    ...errorResponses,
   },
 })
 
@@ -137,9 +135,11 @@ export const deleteVacancyRoute = createRoute({
     [HttpStatusCodes.NO_CONTENT]: {
       description: "Deleted",
     },
-    [HttpStatusCodes.UNAUTHORIZED]: error[HttpStatusCodes.UNAUTHORIZED],
-    [HttpStatusCodes.FORBIDDEN]: error[HttpStatusCodes.FORBIDDEN],
-    [HttpStatusCodes.NOT_FOUND]: error[HttpStatusCodes.NOT_FOUND],
+    ...jsonErrors(
+      HttpStatusCodes.UNAUTHORIZED,
+      HttpStatusCodes.FORBIDDEN,
+      HttpStatusCodes.NOT_FOUND,
+    ),
   },
 })
 

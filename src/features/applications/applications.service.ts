@@ -214,6 +214,36 @@ export async function requestFollowUp(organizationId: string, id: string) {
   return toApplication(existing, (await interviewsFor([existing.id])).get(existing.id) ?? null)
 }
 
+export async function failIfStillAwaitingReview(applicationId: string) {
+  const existing = await applicationsRepository.findById(applicationId)
+  if (!existing || !["SUBMITTED", "REVIEWING"].includes(existing.status)) {
+    return false
+  }
+
+  const row = await applicationsRepository.updateStatusIfCurrent(
+    applicationId,
+    ["SUBMITTED", "REVIEWING"],
+    "FAILED",
+  )
+  if (!row) {
+    return false
+  }
+
+  const vacancy = await vacanciesRepository.findVacancyById(row.vacancyId)
+  await notificationsService.notify(row.userId, {
+    type: "APPLICATION_FAILED",
+    title: "Application closed",
+    body: vacancy
+      ? `Your application for ${vacancy.title} was closed as unsuccessful after 90 days without progress.`
+      : "Your application was closed as unsuccessful after 90 days without progress.",
+    href: `/seeker/applications/${row.id}`,
+    entityType: "application",
+    entityId: row.id,
+  })
+
+  return true
+}
+
 export async function markStaleForOrganization(organizationId: string) {
   const cutoff = new Date(Date.now() - INACTIVE_AFTER_DAYS * 24 * 60 * 60 * 1000)
   const rows = await applicationsRepository.listStaleForOrganization(organizationId, cutoff)

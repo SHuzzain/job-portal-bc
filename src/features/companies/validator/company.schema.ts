@@ -7,6 +7,4 @@ export const companyIdParamSchema = z
   })
   .openapi("CompanyIdParam")
 
-export const errorMessageSchema = z.object({ message: z.string() }).openapi("CompanyErrorMessage")
-
 export { companySchema }

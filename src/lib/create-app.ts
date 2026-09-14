@@ -22,7 +22,7 @@ export function createApp(): AppOpenAPI {
     cors({
       origin: env.FRONTEND_URL,
       credentials: true,
-      allowHeaders: ["Content-Type", "Authorization"],
+      allowHeaders: ["Content-Type", "Authorization", "x-locale", "x-webhook-secret"],
       allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     }),
   )

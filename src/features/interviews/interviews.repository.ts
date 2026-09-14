@@ -55,3 +55,17 @@ export async function updateStatusById(id: string, status: string) {
   const [row] = await db.update(interview).set({ status }).where(eq(interview.id, id)).returning()
   return row ?? null
 }
+
+export async function updateActiveStatusByApplicationId(applicationId: string, status: string) {
+  const [row] = await db
+    .update(interview)
+    .set({ status })
+    .where(
+      and(
+        eq(interview.applicationId, applicationId),
+        inArray(interview.status, ["SCHEDULED", "CONFIRMED"]),
+      ),
+    )
+    .returning()
+  return row ?? null
+}

@@ -6,7 +6,7 @@
 - Auth HTTP is only `app.all("/api/auth/*", (c) => auth.handler(c.req.raw))`.
 
 ## Auth plugins
-Enable: `admin`, `organization` (with `ac` Role objects, not string arrays), `customSession`, `bearer`, `openAPI`, optional `genericOAuth` (MyDigital ID).
+Enable: `admin`, `organization` (with `ac` Role objects, not string arrays), `customSession`, `bearer`, `openAPI`, `i18n` (`@better-auth/i18n`, locales `en` | `ms`), optional `genericOAuth` (MyDigital ID).
 Do NOT add `user.additionalFields.role` — the admin plugin owns `user.role`.
 Do NOT add a static `support` role. Admins create named roles with `organization.createRole` and `page` permissions.
 `createAccessControl` is a helper, not a plugin.

@@ -55,5 +55,3 @@ export const vacancyIdParamSchema = z
     id: z.string().min(1),
   })
   .openapi("VacancyIdParam")
-
-export const errorMessageSchema = z.object({ message: z.string() }).openapi("ErrorMessage")

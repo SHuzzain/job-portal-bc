@@ -5,6 +5,7 @@ import type { auth } from "../auth/index.ts"
 export type AppBindings = {
   Variables: {
     session: typeof auth.$Infer.Session | null
+    organizationId: string
     logger: PinoLogger
   }
 }

@@ -41,6 +41,15 @@ export async function updateStatusById(id: string, status: string) {
   return row ?? null
 }
 
+export async function updateStatusIfCurrent(id: string, currentStatuses: string[], status: string) {
+  const [row] = await db
+    .update(application)
+    .set({ status })
+    .where(and(eq(application.id, id), inArray(application.status, currentStatuses)))
+    .returning()
+  return row ?? null
+}
+
 export async function listStaleForOrganization(organizationId: string, olderThan: Date) {
   return db
     .select({

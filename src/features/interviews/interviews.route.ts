@@ -3,19 +3,9 @@ import * as HttpStatusCodes from "stoker/http-status-codes"
 import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers"
 import { requireApprovedCompany } from "../../auth/middleware.ts"
 import { createRouter } from "../../lib/create-app.ts"
+import { errorResponses } from "../../lib/http-errors.ts"
 import { scheduleInterview } from "./interviews.controller.ts"
-import {
-  errorMessageSchema,
-  interviewSchema,
-  scheduleInterviewBodySchema,
-} from "./validator/interview.schema.ts"
-
-const error = {
-  [HttpStatusCodes.BAD_REQUEST]: jsonContent(errorMessageSchema, "Bad request"),
-  [HttpStatusCodes.UNAUTHORIZED]: jsonContent(errorMessageSchema, "Unauthorized"),
-  [HttpStatusCodes.FORBIDDEN]: jsonContent(errorMessageSchema, "Forbidden"),
-  [HttpStatusCodes.NOT_FOUND]: jsonContent(errorMessageSchema, "Not found"),
-}
+import { interviewSchema, scheduleInterviewBodySchema } from "./validator/interview.schema.ts"
 
 export const scheduleInterviewRoute = createRoute({
   method: "post",
@@ -27,7 +17,7 @@ export const scheduleInterviewRoute = createRoute({
   },
   responses: {
     [HttpStatusCodes.CREATED]: jsonContent(interviewSchema, "Interview scheduled"),
-    ...error,
+    ...errorResponses,
   },
 })
 

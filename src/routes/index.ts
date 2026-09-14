@@ -2,7 +2,12 @@ import applications from "../features/applications/applications.route.ts"
 import companies from "../features/companies/companies.route.ts"
 import interviews from "../features/interviews/interviews.route.ts"
 import notifications from "../features/notifications/notifications.route.ts"
+import interviewReplyWebhooks from "../features/workflows/interview-reply.route.ts"
 import pasak from "../features/pasak/pasak.route.ts"
+import {
+  pasakClaims,
+  providerClaims,
+} from "../features/tvet-claims/tvet-claims.route.ts"
 import resumes from "../features/resumes/resumes.route.ts"
 import seekerProfiles from "../features/seeker-profiles/seeker-profiles.route.ts"
 import tvet from "../features/tvet/tvet.route.ts"
@@ -16,12 +21,15 @@ const routes = createRouter()
   .route("/companies", companies)
   .route("/vacancies", vacancies)
   .route("/pasak", pasak)
+  .route("/pasak", pasakClaims)
   .route("/seeker-profiles", seekerProfiles)
   .route("/resumes", resumes)
   .route("/applications", applications)
   .route("/interviews", interviews)
   .route("/tvet", tvet)
+  .route("/tvet", providerClaims)
   .route("/notifications", notifications)
   .route("/workflows", workflows)
+  .route("/api/webhooks", interviewReplyWebhooks)
 
 export default routes

@@ -3,19 +3,13 @@ import * as HttpStatusCodes from "stoker/http-status-codes"
 import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers"
 import { requireJobseeker } from "../../auth/middleware.ts"
 import { createRouter } from "../../lib/create-app.ts"
+import { jsonErrors } from "../../lib/http-errors.ts"
 import { createResume, deleteResume, listMine } from "./resumes.controller.ts"
 import {
   createResumeBodySchema,
-  errorMessageSchema,
   resumeIdParamSchema,
   resumeSchema,
 } from "./validator/resume.schema.ts"
-
-const error = {
-  [HttpStatusCodes.UNAUTHORIZED]: jsonContent(errorMessageSchema, "Unauthorized"),
-  [HttpStatusCodes.FORBIDDEN]: jsonContent(errorMessageSchema, "Forbidden"),
-  [HttpStatusCodes.NOT_FOUND]: jsonContent(errorMessageSchema, "Not found"),
-}
 
 export const listMineRoute = createRoute({
   method: "get",
@@ -24,7 +18,11 @@ export const listMineRoute = createRoute({
   middleware: [requireJobseeker],
   responses: {
     [HttpStatusCodes.OK]: jsonContent(resumeSchema.array(), "Resumes"),
-    ...error,
+    ...jsonErrors(
+      HttpStatusCodes.UNAUTHORIZED,
+      HttpStatusCodes.FORBIDDEN,
+      HttpStatusCodes.NOT_FOUND,
+    ),
   },
 })
 
@@ -38,7 +36,11 @@ export const createResumeRoute = createRoute({
   },
   responses: {
     [HttpStatusCodes.CREATED]: jsonContent(resumeSchema, "Created resume"),
-    ...error,
+    ...jsonErrors(
+      HttpStatusCodes.UNAUTHORIZED,
+      HttpStatusCodes.FORBIDDEN,
+      HttpStatusCodes.NOT_FOUND,
+    ),
   },
 })
 
@@ -54,7 +56,11 @@ export const deleteResumeRoute = createRoute({
     [HttpStatusCodes.NO_CONTENT]: {
       description: "Deleted",
     },
-    ...error,
+    ...jsonErrors(
+      HttpStatusCodes.UNAUTHORIZED,
+      HttpStatusCodes.FORBIDDEN,
+      HttpStatusCodes.NOT_FOUND,
+    ),
   },
 })
 

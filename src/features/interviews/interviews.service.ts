@@ -1,6 +1,7 @@
 import * as notificationsService from "../notifications/notifications.service.ts"
 import * as applicationsRepository from "../applications/applications.repository.ts"
 import * as vacanciesRepository from "../vacancies/vacancies.repository.ts"
+import * as usersRepository from "../users/users.repository.ts"
 import { interviewModeSchema, interviewStatusSchema } from "./validator/interview.schema.ts"
 import * as interviewsRepository from "./interviews.repository.ts"
 
@@ -65,6 +66,14 @@ export function latestInterviewMap(
 
 const schedulable = new Set(["SHORTLISTED", "WAITING_FOR_INTERVIEW"])
 
+export function interviewDateTime(interviewDate: string, interviewTime: string) {
+  const value = new Date(`${interviewDate}T${interviewTime}`)
+  if (Number.isNaN(value.getTime())) {
+    throw new InterviewError(400, "Invalid interview date or time")
+  }
+  return value
+}
+
 export async function scheduleInterview(
   organizationId: string,
   data: {
@@ -90,6 +99,8 @@ export async function scheduleInterview(
   if (!schedulable.has(existing.status)) {
     throw new InterviewError(403, "Only shortlisted applications can be scheduled for interview")
   }
+
+  interviewDateTime(data.interviewDate, data.interviewTime)
 
   await interviewsRepository.cancelActiveByApplicationId(existing.id)
 
@@ -125,6 +136,77 @@ export async function scheduleInterview(
   })
 
   return toInterview(row)
+}
+
+export async function candidatePhoneForApplication(applicationId: string) {
+  const application = await applicationsRepository.findById(applicationId)
+  if (!application) {
+    return ""
+  }
+  const candidate = await usersRepository.findUserById(application.userId)
+  return candidate?.phoneNumber ?? ""
+}
+
+export async function sendReminder(
+  applicationId: string,
+  expectedInterviewTime: Date,
+  candidatePhone: string,
+) {
+  const application = await applicationsRepository.findById(applicationId)
+  if (!application) {
+    return false
+  }
+
+  const rows = await interviewsRepository.listByApplicationId(applicationId)
+  const active = rows.find((row) => row.status === "SCHEDULED" || row.status === "CONFIRMED")
+  if (
+    !active ||
+    interviewDateTime(active.interviewDate, active.interviewTime).getTime() !==
+      expectedInterviewTime.getTime()
+  ) {
+    return false
+  }
+
+  const vacancy = await vacanciesRepository.findVacancyById(application.vacancyId)
+  void candidatePhone
+  await notificationsService.notify(application.userId, {
+    type: "INTERVIEW_REMINDER",
+    title: "Interview reminder",
+    body: `Your interview${vacancy ? ` for ${vacancy.title}` : ""} is scheduled in 24 hours.`,
+    href: `/seeker/applications/${application.id}`,
+    entityType: "interview",
+    entityId: active.id,
+  })
+  return true
+}
+
+export async function applyCandidateReply(
+  applicationId: string,
+  response: "confirm" | "decline",
+) {
+  const application = await applicationsRepository.findById(applicationId)
+  if (!application) {
+    return false
+  }
+
+  const status = response === "confirm" ? "CONFIRMED" : "CANCELLED"
+  const row = await interviewsRepository.updateActiveStatusByApplicationId(applicationId, status)
+  if (!row) {
+    return false
+  }
+
+  await notificationsService.notify(application.userId, {
+    type: "INTERVIEW_REPLY_RECORDED",
+    title: "Interview response recorded",
+    body:
+      response === "confirm"
+        ? "Your interview attendance has been confirmed."
+        : "Your interview attendance has been declined.",
+    href: `/seeker/applications/${application.id}`,
+    entityType: "interview",
+    entityId: row.id,
+  })
+  return true
 }
 
 export async function completeLatestForApplication(applicationId: string) {

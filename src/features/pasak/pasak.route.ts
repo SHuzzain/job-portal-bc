@@ -3,6 +3,7 @@ import * as HttpStatusCodes from "stoker/http-status-codes"
 import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers"
 import { requirePasakAdmin } from "../../auth/middleware.ts"
 import { createRouter } from "../../lib/create-app.ts"
+import { errorResponses } from "../../lib/http-errors.ts"
 import { vacancySchema } from "../vacancies/validator/vacancy.schema.ts"
 import {
   listCompanies,
@@ -18,7 +19,6 @@ import {
   companyIdParamSchema,
   companySchema,
   employerIdParamSchema,
-  errorMessageSchema,
   listCompaniesQuerySchema,
   listPasakVacanciesQuerySchema,
   pasakEmployerSchema,
@@ -28,13 +28,6 @@ import {
   setVacancyStatusBodySchema,
   vacancyIdParamSchema,
 } from "./validator/pasak.schema.ts"
-
-const error = {
-  [HttpStatusCodes.BAD_REQUEST]: jsonContent(errorMessageSchema, "Bad request"),
-  [HttpStatusCodes.UNAUTHORIZED]: jsonContent(errorMessageSchema, "Unauthorized"),
-  [HttpStatusCodes.FORBIDDEN]: jsonContent(errorMessageSchema, "Forbidden"),
-  [HttpStatusCodes.NOT_FOUND]: jsonContent(errorMessageSchema, "Not found"),
-}
 
 export const listCompaniesRoute = createRoute({
   method: "get",
@@ -46,7 +39,7 @@ export const listCompaniesRoute = createRoute({
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(companySchema.array(), "Companies"),
-    ...error,
+    ...errorResponses,
   },
 })
 
@@ -61,7 +54,7 @@ export const setCompanyStatusRoute = createRoute({
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(companySchema, "Updated company"),
-    ...error,
+    ...errorResponses,
   },
 })
 
@@ -75,7 +68,7 @@ export const listVacanciesRoute = createRoute({
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(vacancySchema.array(), "Vacancies"),
-    ...error,
+    ...errorResponses,
   },
 })
 
@@ -90,7 +83,7 @@ export const reviewCompanyRoute = createRoute({
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(companySchema, "Reviewed company"),
-    ...error,
+    ...errorResponses,
   },
 })
 
@@ -105,7 +98,7 @@ export const reviewVacancyRoute = createRoute({
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(vacancySchema, "Reviewed vacancy"),
-    ...error,
+    ...errorResponses,
   },
 })
 
@@ -120,7 +113,7 @@ export const setVacancyStatusRoute = createRoute({
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(vacancySchema, "Updated vacancy"),
-    ...error,
+    ...errorResponses,
   },
 })
 
@@ -131,7 +124,7 @@ export const listEmployersRoute = createRoute({
   middleware: [requirePasakAdmin],
   responses: {
     [HttpStatusCodes.OK]: jsonContent(pasakEmployerSchema.array(), "Employer accounts"),
-    ...error,
+    ...errorResponses,
   },
 })
 
@@ -146,7 +139,7 @@ export const setTvetCapabilityRoute = createRoute({
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(pasakEmployerSchema, "Updated employer TVET capability"),
-    ...error,
+    ...errorResponses,
   },
 })
 

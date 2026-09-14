@@ -38,5 +38,3 @@ export const updateSeekerProfileBodySchema = z
     hasWorkPermit: z.boolean().optional(),
   })
   .openapi("UpdateSeekerProfileBody")
-
-export const errorMessageSchema = z.object({ message: z.string() }).openapi("SeekerProfileError")

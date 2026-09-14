@@ -95,6 +95,4 @@ export const setTvetCapabilityBodySchema = z
   })
   .openapi("SetTvetCapabilityBody")
 
-export const errorMessageSchema = z.object({ message: z.string() }).openapi("PasakErrorMessage")
-
 export const vacancyListSchema = vacancySchema.array()

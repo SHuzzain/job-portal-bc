@@ -11,9 +11,7 @@ export const ErrorSchema = z.object({
   error: z.unknown(),
 })
 
-export const errorMessageSchema = z.object({
-  message: z.string(),
-})
+export { errorMessageSchema } from "./http-errors.ts"
 
 export const JsonPayloadResponse = <T extends ZodType>(schema: T, description: string) =>
   jsonContent(

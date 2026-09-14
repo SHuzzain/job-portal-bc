@@ -64,6 +64,20 @@
       "when": 1789317288006,
       "tag": "0008_curly_gamora",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1789368069064,
+      "tag": "0009_odd_thunderball",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1789370154094,
+      "tag": "0010_majestic_captain_britain",
+      "breakpoints": true
     }
   ]
 }

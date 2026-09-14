@@ -10,7 +10,8 @@
     "verbatimModuleSyntax": true,
     "allowImportingTsExtensions": true,
     "noEmit": true,
-    "types": ["node"]
+    "types": ["node"],
+    "plugins": [{ "name": "workflow" }]
   },
-  "include": ["src/**/*.ts", "drizzle.config.ts"]
+  "include": ["src/**/*.ts", "plugins/**/*.ts", "drizzle.config.ts", "nitro.config.ts"]
 }

@@ -60,5 +60,3 @@ export const staleSweepResultSchema = z
     marked: z.number().int(),
   })
   .openapi("StaleSweepResult")
-
-export const errorMessageSchema = z.object({ message: z.string() }).openapi("ApplicationError")

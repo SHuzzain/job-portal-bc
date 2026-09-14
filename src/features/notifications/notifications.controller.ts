@@ -1,4 +1,5 @@
 import * as HttpStatusCodes from "stoker/http-status-codes"
+import { authedSession } from "../../lib/session.ts"
 import type { AppRouteHandler } from "../../lib/types.ts"
 import type {
   ListMineRoute,
@@ -10,26 +11,19 @@ import { NotificationError } from "./notifications.service.ts"
 import * as notificationsService from "./notifications.service.ts"
 
 export const listMine: AppRouteHandler<ListMineRoute> = async (c) => {
-    const session = c.get("session")
-    if (!session) {
-      return c.json({ message: "Unauthorized" }, HttpStatusCodes.UNAUTHORIZED)
-    }
+    const session = authedSession(c)
+
     return c.json(await notificationsService.listMine(session.user.id), HttpStatusCodes.OK)
   }
 
 export const unreadCount: AppRouteHandler<UnreadCountRoute> = async (c) => {
-    const session = c.get("session")
-    if (!session) {
-      return c.json({ message: "Unauthorized" }, HttpStatusCodes.UNAUTHORIZED)
-    }
+    const session = authedSession(c)
+
     return c.json(await notificationsService.unreadCount(session.user.id), HttpStatusCodes.OK)
   }
 
 export const markRead: AppRouteHandler<MarkReadRoute> = async (c) => {
-    const session = c.get("session")
-    if (!session) {
-      return c.json({ message: "Unauthorized" }, HttpStatusCodes.UNAUTHORIZED)
-    }
+    const session = authedSession(c)
 
     try {
       const { id } = c.req.valid("param")
@@ -43,9 +37,7 @@ export const markRead: AppRouteHandler<MarkReadRoute> = async (c) => {
   }
 
 export const markAllRead: AppRouteHandler<MarkAllReadRoute> = async (c) => {
-    const session = c.get("session")
-    if (!session) {
-      return c.json({ message: "Unauthorized" }, HttpStatusCodes.UNAUTHORIZED)
-    }
+    const session = authedSession(c)
+
     return c.json(await notificationsService.markAllRead(session.user.id), HttpStatusCodes.OK)
   }

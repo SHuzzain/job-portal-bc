@@ -2,7 +2,6 @@ import { createAccessControl } from "better-auth/plugins/access"
 import {
   adminAc,
   defaultStatements,
-  memberAc,
   ownerAc,
 } from "better-auth/plugins/organization/access"
 
@@ -26,23 +25,7 @@ export const admin = organizationAc.newRole({
   page: ["employer_portal", "tvet_portal"],
 })
 
-export const hr = organizationAc.newRole({
-  ...memberAc.statements,
-  member: ["create", "update"],
-  invitation: ["create", "cancel"],
-  vacancy: ["create", "read", "update"],
-  page: ["employer_portal"],
-})
-
-export const finance = organizationAc.newRole({
-  ...memberAc.statements,
-  vacancy: ["read"],
-  page: ["employer_portal"],
-})
-
 export const organizationRoles = {
   owner,
   admin,
-  hr,
-  finance,
 }

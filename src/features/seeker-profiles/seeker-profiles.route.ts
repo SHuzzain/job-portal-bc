@@ -3,17 +3,12 @@ import * as HttpStatusCodes from "stoker/http-status-codes"
 import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers"
 import { requireJobseeker } from "../../auth/middleware.ts"
 import { createRouter } from "../../lib/create-app.ts"
+import { jsonErrors } from "../../lib/http-errors.ts"
 import { getMine, updateMine } from "./seeker-profiles.controller.ts"
 import {
-  errorMessageSchema,
   seekerProfileSchema,
   updateSeekerProfileBodySchema,
 } from "./validator/seeker-profile.schema.ts"
-
-const error = {
-  [HttpStatusCodes.UNAUTHORIZED]: jsonContent(errorMessageSchema, "Unauthorized"),
-  [HttpStatusCodes.FORBIDDEN]: jsonContent(errorMessageSchema, "Forbidden"),
-}
 
 export const getMineRoute = createRoute({
   method: "get",
@@ -22,7 +17,7 @@ export const getMineRoute = createRoute({
   middleware: [requireJobseeker],
   responses: {
     [HttpStatusCodes.OK]: jsonContent(seekerProfileSchema, "Seeker profile"),
-    ...error,
+    ...jsonErrors(HttpStatusCodes.UNAUTHORIZED, HttpStatusCodes.FORBIDDEN),
   },
 })
 
@@ -36,7 +31,7 @@ export const updateMineRoute = createRoute({
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(seekerProfileSchema, "Updated seeker profile"),
-    ...error,
+    ...jsonErrors(HttpStatusCodes.UNAUTHORIZED, HttpStatusCodes.FORBIDDEN),
   },
 })
 

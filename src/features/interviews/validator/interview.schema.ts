@@ -46,5 +46,3 @@ export const applicationIdParamSchema = z
     applicationId: z.string().min(1),
   })
   .openapi("InterviewApplicationIdParam")
-
-export const errorMessageSchema = z.object({ message: z.string() }).openapi("InterviewErrorMessage")

@@ -2,18 +2,13 @@ import { createRoute } from "@hono/zod-openapi"
 import * as HttpStatusCodes from "stoker/http-status-codes"
 import { jsonContent } from "stoker/openapi/helpers"
 import { createRouter } from "../../lib/create-app.ts"
+import { jsonErrors } from "../../lib/http-errors.ts"
 import { listMine, markAllRead, markRead, unreadCount } from "./notifications.controller.ts"
 import {
-  errorMessageSchema,
   notificationIdParamSchema,
   notificationSchema,
   unreadCountSchema,
 } from "./validator/notification.schema.ts"
-
-const error = {
-  [HttpStatusCodes.UNAUTHORIZED]: jsonContent(errorMessageSchema, "Unauthorized"),
-  [HttpStatusCodes.NOT_FOUND]: jsonContent(errorMessageSchema, "Not found"),
-}
 
 export const listMineRoute = createRoute({
   method: "get",
@@ -21,7 +16,7 @@ export const listMineRoute = createRoute({
   tags: ["Notifications"],
   responses: {
     [HttpStatusCodes.OK]: jsonContent(notificationSchema.array(), "My notifications"),
-    ...error,
+    ...jsonErrors(HttpStatusCodes.UNAUTHORIZED, HttpStatusCodes.NOT_FOUND),
   },
 })
 
@@ -31,7 +26,7 @@ export const unreadCountRoute = createRoute({
   tags: ["Notifications"],
   responses: {
     [HttpStatusCodes.OK]: jsonContent(unreadCountSchema, "Unread count"),
-    ...error,
+    ...jsonErrors(HttpStatusCodes.UNAUTHORIZED, HttpStatusCodes.NOT_FOUND),
   },
 })
 
@@ -44,7 +39,7 @@ export const markReadRoute = createRoute({
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(notificationSchema, "Marked read"),
-    ...error,
+    ...jsonErrors(HttpStatusCodes.UNAUTHORIZED, HttpStatusCodes.NOT_FOUND),
   },
 })
 
@@ -54,7 +49,7 @@ export const markAllReadRoute = createRoute({
   tags: ["Notifications"],
   responses: {
     [HttpStatusCodes.OK]: jsonContent(notificationSchema.array(), "All marked read"),
-    ...error,
+    ...jsonErrors(HttpStatusCodes.UNAUTHORIZED, HttpStatusCodes.NOT_FOUND),
   },
 })
 
