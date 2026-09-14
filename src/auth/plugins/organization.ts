@@ -16,6 +16,13 @@ export const organizationPlugin = organization({
   dynamicAccessControl: {
     enabled: true,
   },
+  sendInvitationEmail: async ({ email, role, organization }) => {
+    console.info("organization invitation created", {
+      email,
+      role,
+      organizationId: organization.id,
+    })
+  },
   schema: {
     organization: {
       additionalFields: {
