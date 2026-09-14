@@ -1,7 +1,11 @@
 import { createRoute } from "@hono/zod-openapi"
 import * as HttpStatusCodes from "stoker/http-status-codes"
 import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers"
-import { requireActiveCompany, requireApprovedCompany } from "../../auth/middleware.ts"
+import {
+  requireActiveCompany,
+  requireCompanyPermission,
+  requirePermission,
+} from "../../auth/middleware.ts"
 import { createRouter } from "../../lib/create-app.ts"
 import { errorResponses, jsonErrors } from "../../lib/http-errors.ts"
 import {
@@ -38,7 +42,7 @@ export const listMineVacanciesRoute = createRoute({
   method: "get",
   path: "/mine",
   tags: ["Vacancies"],
-  middleware: [requireActiveCompany],
+  middleware: [requireActiveCompany, requirePermission("vacancy", "view")],
   responses: {
     [HttpStatusCodes.OK]: jsonContent(vacancySchema.array(), "Vacancies for the active company"),
     ...jsonErrors(HttpStatusCodes.BAD_REQUEST, HttpStatusCodes.UNAUTHORIZED),
@@ -62,7 +66,7 @@ export const createVacancyRoute = createRoute({
   method: "post",
   path: "/",
   tags: ["Vacancies"],
-  middleware: [requireApprovedCompany],
+  middleware: [requireCompanyPermission("vacancy", "create")],
   request: {
     body: jsonContentRequired(createVacancyBodySchema, "Vacancy"),
   },
@@ -80,7 +84,7 @@ export const updateVacancyRoute = createRoute({
   method: "patch",
   path: "/{id}",
   tags: ["Vacancies"],
-  middleware: [requireApprovedCompany],
+  middleware: [requireCompanyPermission("vacancy", "update")],
   request: {
     params: vacancyIdParamSchema,
     body: jsonContentRequired(updateVacancyBodySchema, "Vacancy fields"),
@@ -95,7 +99,7 @@ export const getMineVacancyRoute = createRoute({
   method: "get",
   path: "/mine/{id}",
   tags: ["Vacancies"],
-  middleware: [requireActiveCompany],
+  middleware: [requireActiveCompany, requirePermission("vacancy", "view")],
   request: {
     params: vacancyIdParamSchema,
   },
@@ -113,7 +117,7 @@ export const resubmitVacancyRoute = createRoute({
   method: "post",
   path: "/{id}/resubmit",
   tags: ["Vacancies"],
-  middleware: [requireApprovedCompany],
+  middleware: [requireCompanyPermission("vacancy", "resubmit")],
   request: {
     params: vacancyIdParamSchema,
   },
@@ -127,7 +131,7 @@ export const deleteVacancyRoute = createRoute({
   method: "delete",
   path: "/{id}",
   tags: ["Vacancies"],
-  middleware: [requireApprovedCompany],
+  middleware: [requireCompanyPermission("vacancy", "delete")],
   request: {
     params: vacancyIdParamSchema,
   },

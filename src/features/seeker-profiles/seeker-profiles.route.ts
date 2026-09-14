@@ -1,7 +1,7 @@
 import { createRoute } from "@hono/zod-openapi"
 import * as HttpStatusCodes from "stoker/http-status-codes"
 import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers"
-import { requireJobseeker } from "../../auth/middleware.ts"
+import { requirePermission } from "../../auth/middleware.ts"
 import { createRouter } from "../../lib/create-app.ts"
 import { jsonErrors } from "../../lib/http-errors.ts"
 import { getMine, updateMine } from "./seeker-profiles.controller.ts"
@@ -14,7 +14,7 @@ export const getMineRoute = createRoute({
   method: "get",
   path: "/me",
   tags: ["SeekerProfiles"],
-  middleware: [requireJobseeker],
+  middleware: [requirePermission("seeker_profile", "view")],
   responses: {
     [HttpStatusCodes.OK]: jsonContent(seekerProfileSchema, "Seeker profile"),
     ...jsonErrors(HttpStatusCodes.UNAUTHORIZED, HttpStatusCodes.FORBIDDEN),
@@ -25,7 +25,7 @@ export const updateMineRoute = createRoute({
   method: "patch",
   path: "/me",
   tags: ["SeekerProfiles"],
-  middleware: [requireJobseeker],
+  middleware: [requirePermission("seeker_profile", "update")],
   request: {
     body: jsonContentRequired(updateSeekerProfileBodySchema, "Seeker profile fields"),
   },

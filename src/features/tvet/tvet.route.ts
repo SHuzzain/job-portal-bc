@@ -1,7 +1,10 @@
 import { createRoute, z } from "@hono/zod-openapi";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
-import { requireJobseeker, requireTvetCompany } from "../../auth/middleware.ts";
+import {
+  requirePermission,
+  requireTvetPermission,
+} from "../../auth/middleware.ts";
 import { createRouter } from "../../lib/create-app.ts";
 import { errorResponses } from "../../lib/http-errors.ts";
 import {
@@ -36,7 +39,7 @@ export const listRfpsRoute = createRoute({
   method: "get",
   path: "/rfps",
   tags: ["TVET"],
-  middleware: [requireTvetCompany],
+  middleware: [requireTvetPermission("tvet_rfp", "view")],
   responses: {
     [HttpStatusCodes.OK]: jsonContent(tvetRfpSchema.array(), "Company RFPs"),
     ...errorResponses,
@@ -47,7 +50,7 @@ export const createRfpRoute = createRoute({
   method: "post",
   path: "/rfps",
   tags: ["TVET"],
-  middleware: [requireTvetCompany],
+  middleware: [requireTvetPermission("tvet_rfp", "create")],
   request: {
     body: jsonContentRequired(createRfpBodySchema, "RFP"),
   },
@@ -61,7 +64,7 @@ export const updateRfpRoute = createRoute({
   method: "patch",
   path: "/rfps/{id}",
   tags: ["TVET"],
-  middleware: [requireTvetCompany],
+  middleware: [requireTvetPermission("tvet_rfp", "update")],
   request: {
     params: tvetIdParamSchema,
     body: jsonContentRequired(updateRfpBodySchema, "RFP fields"),
@@ -76,7 +79,7 @@ export const listSessionsRoute = createRoute({
   method: "get",
   path: "/sessions",
   tags: ["TVET"],
-  middleware: [requireTvetCompany],
+  middleware: [requireTvetPermission("tvet_session", "view")],
   request: {
     query: listSessionsQuerySchema,
   },
@@ -93,7 +96,7 @@ export const createSessionRoute = createRoute({
   method: "post",
   path: "/sessions",
   tags: ["TVET"],
-  middleware: [requireTvetCompany],
+  middleware: [requireTvetPermission("tvet_session", "create")],
   request: {
     body: jsonContentRequired(createSessionBodySchema, "Session"),
   },
@@ -110,7 +113,7 @@ export const getSessionRoute = createRoute({
   method: "get",
   path: "/sessions/{id}",
   tags: ["TVET"],
-  middleware: [requireTvetCompany],
+  middleware: [requireTvetPermission("tvet_session", "view")],
   request: {
     params: tvetIdParamSchema,
   },
@@ -127,7 +130,7 @@ export const scanRoute = createRoute({
   method: "post",
   path: "/scan",
   tags: ["TVET"],
-  middleware: [requireJobseeker],
+  middleware: [requirePermission("tvet_attendance", "scan")],
   request: {
     body: jsonContentRequired(scanBodySchema, "Barcode"),
   },
@@ -144,7 +147,7 @@ export const listMyAttendanceRoute = createRoute({
   method: "get",
   path: "/attendance/mine",
   tags: ["TVET"],
-  middleware: [requireJobseeker],
+  middleware: [requirePermission("tvet_attendance", "view")],
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
       tvetAttendanceSchema.array(),
@@ -158,7 +161,7 @@ export const submitSurveyRoute = createRoute({
   method: "post",
   path: "/sessions/{id}/survey",
   tags: ["TVET"],
-  middleware: [requireJobseeker],
+  middleware: [requirePermission("tvet_certificate", "submit_survey")],
   request: {
     params: tvetIdParamSchema,
     body: jsonContentRequired(submitSurveyBodySchema, "Course survey"),
@@ -176,7 +179,7 @@ export const getCertificateRoute = createRoute({
   method: "get",
   path: "/sessions/{id}/certificate",
   tags: ["TVET"],
-  middleware: [requireJobseeker],
+  middleware: [requirePermission("tvet_certificate", "view")],
   request: {
     params: tvetIdParamSchema,
   },
@@ -193,7 +196,7 @@ export const downloadCertificateRoute = createRoute({
   method: "get",
   path: "/sessions/{id}/certificate/download",
   tags: ["TVET"],
-  middleware: [requireJobseeker],
+  middleware: [requirePermission("tvet_certificate", "download")],
   request: {
     params: tvetIdParamSchema,
   },

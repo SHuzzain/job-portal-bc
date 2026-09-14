@@ -4,6 +4,8 @@ import interviews from "../features/interviews/interviews.route.ts"
 import notifications from "../features/notifications/notifications.route.ts"
 import interviewReplyWebhooks from "../features/workflows/interview-reply.route.ts"
 import pasak from "../features/pasak/pasak.route.ts"
+import platformRoles from "../features/platform-roles/platform-roles.route.ts"
+import platformUsers from "../features/platform-users/platform-users.route.ts"
 import {
   pasakClaims,
   providerClaims,
@@ -22,6 +24,8 @@ const routes = createRouter()
   .route("/vacancies", vacancies)
   .route("/pasak", pasak)
   .route("/pasak", pasakClaims)
+  .route("/platform", platformRoles)
+  .route("/platform", platformUsers)
   .route("/seeker-profiles", seekerProfiles)
   .route("/resumes", resumes)
   .route("/applications", applications)

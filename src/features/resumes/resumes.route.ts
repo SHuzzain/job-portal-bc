@@ -1,7 +1,7 @@
 import { createRoute } from "@hono/zod-openapi"
 import * as HttpStatusCodes from "stoker/http-status-codes"
 import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers"
-import { requireJobseeker } from "../../auth/middleware.ts"
+import { requirePermission } from "../../auth/middleware.ts"
 import { createRouter } from "../../lib/create-app.ts"
 import { jsonErrors } from "../../lib/http-errors.ts"
 import { createResume, deleteResume, listMine } from "./resumes.controller.ts"
@@ -15,7 +15,7 @@ export const listMineRoute = createRoute({
   method: "get",
   path: "/",
   tags: ["Resumes"],
-  middleware: [requireJobseeker],
+  middleware: [requirePermission("resume", "view")],
   responses: {
     [HttpStatusCodes.OK]: jsonContent(resumeSchema.array(), "Resumes"),
     ...jsonErrors(
@@ -30,7 +30,7 @@ export const createResumeRoute = createRoute({
   method: "post",
   path: "/",
   tags: ["Resumes"],
-  middleware: [requireJobseeker],
+  middleware: [requirePermission("resume", "create")],
   request: {
     body: jsonContentRequired(createResumeBodySchema, "Resume"),
   },
@@ -48,7 +48,7 @@ export const deleteResumeRoute = createRoute({
   method: "delete",
   path: "/{id}",
   tags: ["Resumes"],
-  middleware: [requireJobseeker],
+  middleware: [requirePermission("resume", "delete")],
   request: {
     params: resumeIdParamSchema,
   },

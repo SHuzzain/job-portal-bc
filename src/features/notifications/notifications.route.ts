@@ -1,6 +1,7 @@
 import { createRoute } from "@hono/zod-openapi"
 import * as HttpStatusCodes from "stoker/http-status-codes"
 import { jsonContent } from "stoker/openapi/helpers"
+import { requirePermission } from "../../auth/middleware.ts"
 import { createRouter } from "../../lib/create-app.ts"
 import { jsonErrors } from "../../lib/http-errors.ts"
 import { listMine, markAllRead, markRead, unreadCount } from "./notifications.controller.ts"
@@ -14,6 +15,7 @@ export const listMineRoute = createRoute({
   method: "get",
   path: "/",
   tags: ["Notifications"],
+  middleware: [requirePermission("notification", "view")],
   responses: {
     [HttpStatusCodes.OK]: jsonContent(notificationSchema.array(), "My notifications"),
     ...jsonErrors(HttpStatusCodes.UNAUTHORIZED, HttpStatusCodes.NOT_FOUND),
@@ -24,6 +26,7 @@ export const unreadCountRoute = createRoute({
   method: "get",
   path: "/unread-count",
   tags: ["Notifications"],
+  middleware: [requirePermission("notification", "view")],
   responses: {
     [HttpStatusCodes.OK]: jsonContent(unreadCountSchema, "Unread count"),
     ...jsonErrors(HttpStatusCodes.UNAUTHORIZED, HttpStatusCodes.NOT_FOUND),
@@ -34,6 +37,7 @@ export const markReadRoute = createRoute({
   method: "patch",
   path: "/{id}/read",
   tags: ["Notifications"],
+  middleware: [requirePermission("notification", "mark_read")],
   request: {
     params: notificationIdParamSchema,
   },
@@ -47,6 +51,7 @@ export const markAllReadRoute = createRoute({
   method: "post",
   path: "/read-all",
   tags: ["Notifications"],
+  middleware: [requirePermission("notification", "mark_read")],
   responses: {
     [HttpStatusCodes.OK]: jsonContent(notificationSchema.array(), "All marked read"),
     ...jsonErrors(HttpStatusCodes.UNAUTHORIZED, HttpStatusCodes.NOT_FOUND),

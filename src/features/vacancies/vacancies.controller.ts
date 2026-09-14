@@ -1,5 +1,4 @@
 import * as HttpStatusCodes from "stoker/http-status-codes"
-import { auth } from "../../auth/index.ts"
 import { organizationId } from "../../lib/session.ts"
 import type { AppRouteHandler } from "../../lib/types.ts"
 import type {
@@ -73,15 +72,6 @@ export const get: AppRouteHandler<GetVacancyRoute> = async (c) => {
 }
 
 export const create: AppRouteHandler<CreateVacancyRoute> = async (c) => {
-  const permission = await auth.api.hasPermission({
-    headers: c.req.raw.headers,
-    body: { permissions: { vacancy: ["create"] } },
-  })
-
-  if (!permission?.success) {
-    return c.json({ message: "Missing vacancy.create permission" }, HttpStatusCodes.FORBIDDEN)
-  }
-
   try {
     const vacancy = await vacanciesService.createVacancy(organizationId(c), c.req.valid("json"))
     return c.json(vacancy, HttpStatusCodes.CREATED)

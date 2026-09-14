@@ -1,7 +1,26 @@
 import { createRoute } from "@hono/zod-openapi"
 import * as HttpStatusCodes from "stoker/http-status-codes"
 import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers"
-import { requirePasakAdmin } from "../../auth/middleware.ts"
+import { requirePermission, requirePermissionFor } from "../../auth/middleware.ts"
+
+const reviewActions: Record<string, string> = {
+  APPROVE: "approve",
+  REJECT: "reject",
+  RETURN_FOR_CORRECTION: "return",
+}
+
+const statusActions: Record<string, string> = {
+  APPROVED: "approve",
+  REJECTED: "reject",
+}
+
+function reviewAction(body: Record<string, unknown>) {
+  return typeof body.action === "string" ? (reviewActions[body.action] ?? null) : null
+}
+
+function statusAction(body: Record<string, unknown>) {
+  return typeof body.status === "string" ? (statusActions[body.status] ?? null) : null
+}
 import { createRouter } from "../../lib/create-app.ts"
 import { errorResponses } from "../../lib/http-errors.ts"
 import { vacancySchema } from "../vacancies/validator/vacancy.schema.ts"
@@ -33,7 +52,7 @@ export const listCompaniesRoute = createRoute({
   method: "get",
   path: "/companies",
   tags: ["PASAK"],
-  middleware: [requirePasakAdmin],
+  middleware: [requirePermission("company_review", "view")],
   request: {
     query: listCompaniesQuerySchema,
   },
@@ -47,7 +66,7 @@ export const setCompanyStatusRoute = createRoute({
   method: "patch",
   path: "/companies/{id}",
   tags: ["PASAK"],
-  middleware: [requirePasakAdmin],
+  middleware: [requirePermissionFor("company_review", statusAction)],
   request: {
     params: companyIdParamSchema,
     body: jsonContentRequired(setCompanyStatusBodySchema, "Company status"),
@@ -62,7 +81,7 @@ export const listVacanciesRoute = createRoute({
   method: "get",
   path: "/vacancies",
   tags: ["PASAK"],
-  middleware: [requirePasakAdmin],
+  middleware: [requirePermission("vacancy_review", "view")],
   request: {
     query: listPasakVacanciesQuerySchema,
   },
@@ -76,7 +95,7 @@ export const reviewCompanyRoute = createRoute({
   method: "post",
   path: "/companies/{id}/review",
   tags: ["PASAK"],
-  middleware: [requirePasakAdmin],
+  middleware: [requirePermissionFor("company_review", reviewAction)],
   request: {
     params: companyIdParamSchema,
     body: jsonContentRequired(reviewBodySchema, "Review action"),
@@ -91,7 +110,7 @@ export const reviewVacancyRoute = createRoute({
   method: "post",
   path: "/vacancies/{id}/review",
   tags: ["PASAK"],
-  middleware: [requirePasakAdmin],
+  middleware: [requirePermissionFor("vacancy_review", reviewAction)],
   request: {
     params: vacancyIdParamSchema,
     body: jsonContentRequired(reviewBodySchema, "Review action"),
@@ -106,7 +125,7 @@ export const setVacancyStatusRoute = createRoute({
   method: "patch",
   path: "/vacancies/{id}",
   tags: ["PASAK"],
-  middleware: [requirePasakAdmin],
+  middleware: [requirePermissionFor("vacancy_review", statusAction)],
   request: {
     params: vacancyIdParamSchema,
     body: jsonContentRequired(setVacancyStatusBodySchema, "Vacancy status"),
@@ -121,7 +140,7 @@ export const listEmployersRoute = createRoute({
   method: "get",
   path: "/employers",
   tags: ["PASAK"],
-  middleware: [requirePasakAdmin],
+  middleware: [requirePermission("tvet_capability", "view")],
   responses: {
     [HttpStatusCodes.OK]: jsonContent(pasakEmployerSchema.array(), "Employer accounts"),
     ...errorResponses,
@@ -132,7 +151,15 @@ export const setTvetCapabilityRoute = createRoute({
   method: "patch",
   path: "/employers/{id}",
   tags: ["PASAK"],
-  middleware: [requirePasakAdmin],
+  middleware: [
+    requirePermissionFor("tvet_capability", (body) =>
+      typeof body.hasTvetCapability === "boolean"
+        ? body.hasTvetCapability
+          ? "grant"
+          : "revoke"
+        : null,
+    ),
+  ],
   request: {
     params: employerIdParamSchema,
     body: jsonContentRequired(setTvetCapabilityBodySchema, "TVET capability"),

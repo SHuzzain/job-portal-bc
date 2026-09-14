@@ -1,7 +1,20 @@
 import { createRoute } from "@hono/zod-openapi"
 import * as HttpStatusCodes from "stoker/http-status-codes"
 import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers"
-import { requireApprovedCompany, requireJobseeker } from "../../auth/middleware.ts"
+import {
+  requireApprovedCompany,
+  requireCompanyPermission,
+  requirePermission,
+  requirePermissionFor,
+} from "../../auth/middleware.ts"
+
+const applicantActions: Record<string, string> = {
+  SHORTLISTED: "shortlist",
+  INTERVIEW_COMPLETED: "shortlist",
+  REJECTED: "reject",
+  FAILED: "reject",
+  HIRED: "hire",
+}
 import { createRouter } from "../../lib/create-app.ts"
 import { errorResponses } from "../../lib/http-errors.ts"
 import {
@@ -24,7 +37,7 @@ export const createApplicationRoute = createRoute({
   method: "post",
   path: "/",
   tags: ["Applications"],
-  middleware: [requireJobseeker],
+  middleware: [requirePermission("seeker_application", "create")],
   request: {
     body: jsonContentRequired(createApplicationBodySchema, "Application"),
   },
@@ -38,7 +51,7 @@ export const listMineRoute = createRoute({
   method: "get",
   path: "/mine",
   tags: ["Applications"],
-  middleware: [requireJobseeker],
+  middleware: [requirePermission("seeker_application", "view")],
   responses: {
     [HttpStatusCodes.OK]: jsonContent(applicationSchema.array(), "My applications"),
     ...errorResponses,
@@ -49,7 +62,7 @@ export const listForVacancyRoute = createRoute({
   method: "get",
   path: "/vacancy/{vacancyId}",
   tags: ["Applications"],
-  middleware: [requireApprovedCompany],
+  middleware: [requireCompanyPermission("applicant", "view")],
   request: {
     params: vacancyIdParamSchema,
   },
@@ -76,7 +89,12 @@ export const setStatusRoute = createRoute({
   method: "patch",
   path: "/{id}",
   tags: ["Applications"],
-  middleware: [requireApprovedCompany],
+  middleware: [
+    requireApprovedCompany,
+    requirePermissionFor("applicant", (body) =>
+      typeof body.status === "string" ? (applicantActions[body.status] ?? null) : null,
+    ),
+  ],
   request: {
     params: applicationIdParamSchema,
     body: jsonContentRequired(setApplicationStatusBodySchema, "Application status"),
@@ -91,7 +109,7 @@ export const followUpRoute = createRoute({
   method: "post",
   path: "/{id}/follow-up",
   tags: ["Applications"],
-  middleware: [requireApprovedCompany],
+  middleware: [requireCompanyPermission("applicant", "follow_up")],
   request: {
     params: applicationIdParamSchema,
   },

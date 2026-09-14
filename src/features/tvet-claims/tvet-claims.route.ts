@@ -2,8 +2,9 @@ import { createRoute, z } from "@hono/zod-openapi";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
 import {
-  requirePasakAdmin,
-  requireTvetCompany,
+  requirePermission,
+  requirePermissionFor,
+  requireTvetPermission,
 } from "../../auth/middleware.ts";
 import { createRouter } from "../../lib/create-app.ts";
 import { errorResponses } from "../../lib/http-errors.ts";
@@ -40,7 +41,7 @@ export const listEligibleCoursesRoute = createRoute({
   method: "get",
   path: "/claims/eligible-courses",
   tags: ["TVET Claims"],
-  middleware: [requireTvetCompany],
+  middleware: [requireTvetPermission("tvet_claim", "create")],
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
       eligibleCourseSchema.array(),
@@ -54,7 +55,7 @@ export const listProviderClaimsRoute = createRoute({
   method: "get",
   path: "/claims",
   tags: ["TVET Claims"],
-  middleware: [requireTvetCompany],
+  middleware: [requireTvetPermission("tvet_claim", "view")],
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
       tvetClaimSchema.array(),
@@ -68,7 +69,7 @@ export const submitClaimRoute = createRoute({
   method: "post",
   path: "/claims",
   tags: ["TVET Claims"],
-  middleware: [requireTvetCompany],
+  middleware: [requireTvetPermission("tvet_claim", "create")],
   request: {
     body: jsonContentRequired(submitClaimBodySchema, "TVET finance claim"),
   },
@@ -82,7 +83,7 @@ export const uploadSignedClaimRoute = createRoute({
   method: "post",
   path: "/claims/{id}/upload-signed",
   tags: ["TVET Claims"],
-  middleware: [requireTvetCompany],
+  middleware: [requireTvetPermission("tvet_claim", "upload_signed")],
   request: {
     params: claimIdParamSchema,
     body: jsonContentRequired(
@@ -100,7 +101,7 @@ export const downloadPaymentVoucherRoute = createRoute({
   method: "get",
   path: "/claims/{id}/payment-voucher",
   tags: ["TVET Claims"],
-  middleware: [requireTvetCompany],
+  middleware: [requireTvetPermission("tvet_claim", "download")],
   request: { params: claimIdParamSchema },
   responses: { [HttpStatusCodes.OK]: pdfResponse, ...errorResponses },
 });
@@ -109,7 +110,7 @@ export const downloadBorangAkuanRoute = createRoute({
   method: "get",
   path: "/claims/{id}/borang-akuan",
   tags: ["TVET Claims"],
-  middleware: [requireTvetCompany],
+  middleware: [requireTvetPermission("tvet_claim", "download")],
   request: { params: claimIdParamSchema },
   responses: { [HttpStatusCodes.OK]: pdfResponse, ...errorResponses },
 });
@@ -118,7 +119,7 @@ export const listPasakClaimsRoute = createRoute({
   method: "get",
   path: "/claims",
   tags: ["PASAK TVET Claims"],
-  middleware: [requirePasakAdmin],
+  middleware: [requirePermission("claim_review", "view")],
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
       tvetClaimSchema.array(),
@@ -132,7 +133,11 @@ export const reviewClaimRoute = createRoute({
   method: "post",
   path: "/claims/{id}/review",
   tags: ["PASAK TVET Claims"],
-  middleware: [requirePasakAdmin],
+  middleware: [
+    requirePermissionFor("claim_review", (body) =>
+      body.action === "APPROVE" ? "approve" : body.action === "REJECT" ? "reject" : null,
+    ),
+  ],
   request: {
     params: claimIdParamSchema,
     body: jsonContentRequired(reviewClaimBodySchema, "Finance review"),
@@ -147,7 +152,7 @@ export const finalizeClaimRoute = createRoute({
   method: "post",
   path: "/claims/{id}/finalize-payment",
   tags: ["PASAK TVET Claims"],
-  middleware: [requirePasakAdmin],
+  middleware: [requirePermission("claim_review", "finalize")],
   request: { params: claimIdParamSchema },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(tvetClaimSchema, "Paid claim"),

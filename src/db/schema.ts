@@ -1,6 +1,7 @@
 export { application } from "../features/applications/applications.schema.ts"
 export { interview } from "../features/interviews/interviews.schema.ts"
 export { notification } from "../features/notifications/notifications.schema.ts"
+export { platformRole } from "../features/platform-roles/platform-roles.schema.ts"
 export {
   tvetClaim,
   tvetClaimStatus,

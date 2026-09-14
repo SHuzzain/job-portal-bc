@@ -8,8 +8,12 @@
 ## Auth plugins
 Enable: `admin`, `organization` (with `ac` Role objects, not string arrays), `customSession`, `bearer`, `openAPI`, `i18n` (`@better-auth/i18n`, locales `en` | `ms`), optional `genericOAuth` (MyDigital ID).
 Do NOT add `user.additionalFields.role` — the admin plugin owns `user.role`.
-Do NOT add a static `support` role. Admins create named roles with `organization.createRole` and `page` permissions.
+Do NOT add a static `support` role. Company roles are created with `organization.createRole`; platform roles are rows in `platform_role`.
 `createAccessControl` is a helper, not a plugin.
+
+## Access control
+- `src/auth/access/catalog.ts` is the single source of truth: each resource lists only the actions its routes support. Both `platformAc` and `organizationAc` are built from it.
+- Guard routes with `requirePermission(resource, action)`, `requireCompanyPermission`, `requireTvetPermission`, or `requirePermissionFor` when the action depends on the payload. Never branch on role names.
 
 ## Layout
 - `src/auth/`: instance, middleware, plugins, access catalogs.
@@ -17,7 +21,7 @@ Do NOT add a static `support` role. Admins create named roles with `organization
 - `src/features/<name>/`: `*.route.ts`, `*.controller.ts`, `*.service.ts`, `*.repository.ts`, `validator/`.
 
 ## SRS
-- New orgs: `status` default `PENDING_APPROVAL`. Use `requireApprovedCompany` on vacancy/applicant writes.
+- New orgs: `status` default `PENDING_APPROVAL`. Use `requireApprovedCompany` or `requireCompanyPermission` on vacancy/applicant writes.
 - Vacancies (Phase 4+): start `PENDING_APPROVAL`.
 - TVET: `hasTvetCapability`, not a separate account type.
 - CORS + `trustedOrigins` must include `FRONTEND_URL` with `credentials: true`.
