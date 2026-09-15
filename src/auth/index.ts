@@ -7,6 +7,8 @@ import { authPlugins } from "./plugins/index.ts"
 
 const signupRoles = new Set(["jobseeker", "employer"])
 
+export const AUTH_COOKIE_PREFIX = "pasak-auth"
+
 export const auth = betterAuth({
   baseURL: env.BETTER_AUTH_URL,
   secret: env.BETTER_AUTH_SECRET,
@@ -15,6 +17,16 @@ export const auth = betterAuth({
     provider: "pg",
     schema,
   }),
+  session: {
+    cookieCache: {
+      enabled: true,
+      maxAge: 5 * 60,
+      strategy: "compact",
+    },
+  },
+  advanced: {
+    cookiePrefix: AUTH_COOKIE_PREFIX,
+  },
   emailAndPassword: {
     enabled: true,
   },
