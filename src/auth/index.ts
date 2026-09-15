@@ -49,6 +49,12 @@ export const auth = betterAuth({
         defaultValue: false,
         input: false,
       },
+      activeWorkspace: {
+        type: "string",
+        required: false,
+        defaultValue: "employer",
+        input: false,
+      },
     },
   },
   databaseHooks: {

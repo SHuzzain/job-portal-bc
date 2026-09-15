@@ -14,5 +14,6 @@ export const user = pgTable("user", {
   banExpires: timestamp("ban_expires", { withTimezone: true }),
   accountStatus: text("account_status").default("ACTIVE"),
   hasTvetCapability: boolean("has_tvet_capability").default(false),
+  activeWorkspace: text("active_workspace").default("employer"),
   ...timestamps,
 })

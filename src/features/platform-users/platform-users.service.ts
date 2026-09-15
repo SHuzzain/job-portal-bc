@@ -22,6 +22,13 @@ function toUser(row: NonNullable<UserRow>) {
 }
 
 async function roleOr404(name: string) {
+  if (name === "training_provider") {
+    throw new PlatformUserError(
+      400,
+      "Training Provider is a workspace, not a login role",
+    )
+  }
+
   const role = await platformRolesRepository.findRoleByName(name)
   if (!role) {
     throw new PlatformUserError(404, `Platform role "${name}" not found`)

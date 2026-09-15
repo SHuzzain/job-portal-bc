@@ -168,7 +168,10 @@ export async function setTvetCapability(id: string, hasTvetCapability: boolean) 
     throw new PasakError(400, "TVET capability can only be set on employer accounts")
   }
 
-  const row = await usersRepository.updateUserById(id, { hasTvetCapability })
+  const row = await usersRepository.updateUserById(id, {
+    hasTvetCapability,
+    ...(!hasTvetCapability ? { activeWorkspace: "employer" } : {}),
+  })
   if (!row) {
     throw new PasakError(404, "Employer not found")
   }

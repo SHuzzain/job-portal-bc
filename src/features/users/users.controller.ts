@@ -1,7 +1,13 @@
 import * as HttpStatusCodes from "stoker/http-status-codes"
+import { effectiveWorkspace } from "../../auth/access/workspace.ts"
 import { authedSession } from "../../lib/session.ts"
 import type { AppRouteHandler } from "../../lib/types.ts"
-import type { UpdateMeRoute, UpdatePhoneRoute } from "./users.route.ts"
+import type {
+  UpdateMeRoute,
+  UpdatePhoneRoute,
+  UpdateWorkspaceRoute,
+} from "./users.route.ts"
+import { WorkspaceError } from "./users.service.ts"
 import * as usersService from "./users.service.ts"
 
 function toProfile(user: {
@@ -43,3 +49,26 @@ export const updatePhone: AppRouteHandler<UpdatePhoneRoute> = async (c) => {
 
     return c.json(toProfile(user), HttpStatusCodes.OK)
   }
+
+export const updateWorkspace: AppRouteHandler<UpdateWorkspaceRoute> = async (c) => {
+  const session = authedSession(c)
+
+  try {
+    const user = await usersService.updateWorkspace(
+      session.user.id,
+      c.req.valid("json").workspace,
+    )
+    return c.json(
+      {
+        workspace: effectiveWorkspace(user),
+        hasTvetCapability: user.hasTvetCapability === true,
+      },
+      HttpStatusCodes.OK,
+    )
+  } catch (error) {
+    if (error instanceof WorkspaceError) {
+      return c.json({ message: error.message }, error.status)
+    }
+    throw error
+  }
+}

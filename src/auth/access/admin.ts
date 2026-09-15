@@ -27,11 +27,16 @@ const employerPermissions = {
   vacancy: ["view", "create", "update", "delete", "resubmit"],
   applicant: ["view", "shortlist", "reject", "hire", "follow_up"],
   interview: ["view", "schedule"],
+  org_member: ["view", "invite", "update_role", "remove"],
+  org_role: ["view", "create", "update", "delete"],
+  notification: ["view", "mark_read"],
+} as const
+
+const trainingProviderPermissions = {
+  company: ["view", "update"],
   tvet_rfp: ["view", "create", "update", "close"],
   tvet_session: ["view", "create"],
   tvet_claim: ["view", "create", "upload_signed", "download"],
-  org_member: ["view", "invite", "update_role", "remove"],
-  org_role: ["view", "create", "update", "delete"],
   notification: ["view", "mark_read"],
 } as const
 
@@ -86,12 +91,14 @@ export const platformRoles = {
 }
 
 /**
- * Seed permissions for the four system roles, mirrored by the platform_role
- * migration. Custom platform roles live in that table and are not compiled here.
+ * Seed permissions for system roles, mirrored by the platform_role table.
+ * training_provider is workspace-only and is not assigned as user.role.
+ * Custom platform roles live in that table and are not compiled here.
  */
 export const SYSTEM_PLATFORM_PERMISSIONS: Record<string, PermissionMap> = {
   jobseeker: fullPermissions(jobseekerPermissions),
   employer: fullPermissions(employerPermissions),
+  training_provider: fullPermissions(trainingProviderPermissions),
   admin: fullPermissions(adminPermissions),
   super_admin: fullPermissions(platformResourceStatements),
 }

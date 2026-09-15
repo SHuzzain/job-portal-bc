@@ -7,6 +7,7 @@ export type UpdateUserRecord = {
   image?: string | null
   phoneNumber?: string | null
   hasTvetCapability?: boolean
+  activeWorkspace?: string
 }
 
 export async function listEmployers() {

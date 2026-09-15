@@ -12,6 +12,13 @@ import {
   organizationResourceStatements,
   type PermissionMap,
 } from "./access/catalog.ts"
+import {
+  effectiveWorkspace,
+  EMPLOYER_WORKSPACE_RESOURCES,
+  isPasakRole,
+  permissionRoleName,
+  TVET_WORKSPACE_RESOURCES,
+} from "./access/workspace.ts"
 import { auth } from "./index.ts"
 
 async function bindApprovedCompany(c: Context<AppBindings>) {
@@ -64,8 +71,28 @@ async function platformPermissions(c: Context<AppBindings>): Promise<PermissionM
     return attached as PermissionMap
   }
 
-  const role = typeof session.user.role === "string" ? session.user.role : null
-  return platformRolesService.permissionsForRoleName(role)
+  return platformRolesService.permissionsForRoleName(permissionRoleName(session.user))
+}
+
+function workspaceForbidden(c: Context<AppBindings>, resource: string) {
+  const session = authedSession(c)
+  if (isPasakRole(session.user.role)) {
+    return null
+  }
+
+  const workspace = effectiveWorkspace(session.user)
+  if (TVET_WORKSPACE_RESOURCES.has(resource) && workspace !== "training_provider") {
+    return c.json(
+      { message: "Training Provider workspace required" },
+      HttpStatusCodes.FORBIDDEN,
+    )
+  }
+
+  if (EMPLOYER_WORKSPACE_RESOURCES.has(resource) && workspace !== "employer") {
+    return c.json({ message: "Employer workspace required" }, HttpStatusCodes.FORBIDDEN)
+  }
+
+  return null
 }
 
 /**
@@ -74,6 +101,11 @@ async function platformPermissions(c: Context<AppBindings>): Promise<PermissionM
  */
 export function requirePermission(resource: string, action: string) {
   return createMiddleware<AppBindings>(async (c, next) => {
+    const blocked = workspaceForbidden(c, resource)
+    if (blocked) {
+      return blocked
+    }
+
     const permissions = await platformPermissions(c)
     if (hasPermission(permissions, resource, action)) {
       await next()
@@ -140,10 +172,18 @@ export function requireCompanyPermission(resource: string, action: string) {
 export const requireTvetCompany = createMiddleware<AppBindings>(async (c, next) => {
   const session = authedSession(c)
 
-  const role = typeof session.user.role === "string" ? session.user.role : ""
-  const capable = session.user.hasTvetCapability === true
-  if (role === "employer" && !capable) {
-    return c.json({ message: "TVET capability required" }, HttpStatusCodes.FORBIDDEN)
+  if (!isPasakRole(session.user.role)) {
+    const capable = session.user.hasTvetCapability === true
+    if (!capable) {
+      return c.json({ message: "TVET capability required" }, HttpStatusCodes.FORBIDDEN)
+    }
+
+    if (effectiveWorkspace(session.user) !== "training_provider") {
+      return c.json(
+        { message: "Training Provider workspace required" },
+        HttpStatusCodes.FORBIDDEN,
+      )
+    }
   }
 
   const rejected = await bindApprovedCompany(c)
