@@ -1,6 +1,7 @@
-import { pgTable, text, timestamp } from "drizzle-orm/pg-core"
-import { user } from "../users/users.schema.ts"
-import { timestamps } from "../../lib/columns.ts"
+import { pgTable, text, timestamp } from "drizzle-orm/pg-core";
+
+import { timestamps } from "../../lib/columns.ts";
+import { user } from "../users/users.schema.ts";
 
 export const notification = pgTable("notification", {
   id: text("id").primaryKey(),
@@ -15,4 +16,4 @@ export const notification = pgTable("notification", {
   entityId: text("entity_id"),
   readAt: timestamp("read_at", { withTimezone: true }),
   ...timestamps,
-})
+});

@@ -1,4 +1,4 @@
-import { z } from "@hono/zod-openapi"
+import { z } from "@hono/zod-openapi";
 
 export const notificationSchema = z
   .object({
@@ -13,16 +13,16 @@ export const notificationSchema = z
     read: z.boolean(),
     createdAt: z.string(),
   })
-  .openapi("Notification")
+  .openapi("Notification");
 
 export const unreadCountSchema = z
   .object({
     count: z.number().int(),
   })
-  .openapi("NotificationUnreadCount")
+  .openapi("NotificationUnreadCount");
 
 export const notificationIdParamSchema = z
   .object({
     id: z.string().min(1),
   })
-  .openapi("NotificationIdParam")
+  .openapi("NotificationIdParam");

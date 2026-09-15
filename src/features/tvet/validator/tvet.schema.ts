@@ -1,6 +1,8 @@
-import { z } from "@hono/zod-openapi"
+import { z } from "@hono/zod-openapi";
 
-export const rfpStatusSchema = z.enum(["OPEN", "CLOSED"]).openapi("TvetRfpStatus")
+export const rfpStatusSchema = z
+  .enum(["OPEN", "CLOSED"])
+  .openapi("TvetRfpStatus");
 
 export const tvetRfpSchema = z
   .object({
@@ -11,14 +13,14 @@ export const tvetRfpSchema = z
     status: rfpStatusSchema,
     createdAt: z.string(),
   })
-  .openapi("TvetRfp")
+  .openapi("TvetRfp");
 
 export const createRfpBodySchema = z
   .object({
     title: z.string().min(1).max(200),
     description: z.string().min(1).max(8000),
   })
-  .openapi("CreateTvetRfpBody")
+  .openapi("CreateTvetRfpBody");
 
 export const updateRfpBodySchema = z
   .object({
@@ -26,7 +28,7 @@ export const updateRfpBodySchema = z
     description: z.string().min(1).max(8000).optional(),
     status: rfpStatusSchema.optional(),
   })
-  .openapi("UpdateTvetRfpBody")
+  .openapi("UpdateTvetRfpBody");
 
 export const tvetAttendanceSchema = z
   .object({
@@ -41,14 +43,14 @@ export const tvetAttendanceSchema = z
     surveyFeedback: z.string().nullable(),
     createdAt: z.string(),
   })
-  .openapi("TvetAttendance")
+  .openapi("TvetAttendance");
 
 export const submitSurveyBodySchema = z
   .object({
     rating: z.number().int().min(1).max(5),
     feedback: z.string().trim().max(4000).optional(),
   })
-  .openapi("SubmitTvetSurveyBody")
+  .openapi("SubmitTvetSurveyBody");
 
 export const tvetCertificateSchema = z
   .object({
@@ -65,7 +67,7 @@ export const tvetCertificateSchema = z
     downloadAuthorized: z.literal(true),
     downloadUrl: z.string(),
   })
-  .openapi("TvetCertificate")
+  .openapi("TvetCertificate");
 
 export const tvetSessionSchema = z
   .object({
@@ -79,13 +81,13 @@ export const tvetSessionSchema = z
     barcode: z.string(),
     createdAt: z.string(),
   })
-  .openapi("TvetSession")
+  .openapi("TvetSession");
 
 export const tvetSessionDetailSchema = tvetSessionSchema
   .extend({
     attendance: tvetAttendanceSchema.array(),
   })
-  .openapi("TvetSessionDetail")
+  .openapi("TvetSessionDetail");
 
 export const createSessionBodySchema = z
   .object({
@@ -95,22 +97,22 @@ export const createSessionBodySchema = z
     startsAt: z.string().min(1),
     endsAt: z.string().min(1),
   })
-  .openapi("CreateTvetSessionBody")
+  .openapi("CreateTvetSessionBody");
 
 export const listSessionsQuerySchema = z
   .object({
     rfpId: z.string().optional(),
   })
-  .openapi("ListTvetSessionsQuery")
+  .openapi("ListTvetSessionsQuery");
 
 export const tvetIdParamSchema = z
   .object({
     id: z.string().min(1),
   })
-  .openapi("TvetIdParam")
+  .openapi("TvetIdParam");
 
 export const scanBodySchema = z
   .object({
     barcode: z.string().min(1).max(80),
   })
-  .openapi("TvetScanBody")
+  .openapi("TvetScanBody");

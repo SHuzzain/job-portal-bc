@@ -1,5 +1,6 @@
-import { Scalar } from "@scalar/hono-api-reference"
-import type { AppOpenAPI } from "./types.ts"
+import { Scalar } from "@scalar/hono-api-reference";
+
+import type { AppOpenAPI } from "./types.ts";
 
 export function configureOpenAPI(app: AppOpenAPI) {
   app.doc("/doc", {
@@ -8,7 +9,7 @@ export function configureOpenAPI(app: AppOpenAPI) {
       title: "Job Templete API",
       version: "0.0.1",
     },
-  })
+  });
 
   app.get(
     "/reference",
@@ -18,6 +19,6 @@ export function configureOpenAPI(app: AppOpenAPI) {
         { url: "/doc", title: "API" },
         { url: "/api/auth/open-api/generate-schema", title: "Auth" },
       ],
-    }),
-  )
+    })
+  );
 }

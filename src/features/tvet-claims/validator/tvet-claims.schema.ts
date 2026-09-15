@@ -14,11 +14,11 @@ const moneySchema = z
   .string()
   .regex(
     /^(?:0|[1-9]\d{0,9})\.\d{2}$/,
-    "Use a positive amount with two decimals",
+    "Use a positive amount with two decimals"
   )
   .refine(
     (value) => value !== "0.00",
-    "Claim amount must be greater than zero",
+    "Claim amount must be greater than zero"
   );
 
 export const tvetClaimSchema = z

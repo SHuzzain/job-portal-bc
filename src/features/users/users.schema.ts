@@ -1,5 +1,6 @@
-import { boolean, pgTable, text, timestamp } from "drizzle-orm/pg-core"
-import { timestamps } from "../../lib/columns.ts"
+import { boolean, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+
+import { timestamps } from "../../lib/columns.ts";
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -16,4 +17,4 @@ export const user = pgTable("user", {
   hasTvetCapability: boolean("has_tvet_capability").default(false),
   activeWorkspace: text("active_workspace").default("employer"),
   ...timestamps,
-})
+});

@@ -1,4 +1,4 @@
-import { z } from "@hono/zod-openapi"
+import { z } from "@hono/zod-openapi";
 
 export const resumeSchema = z
   .object({
@@ -8,17 +8,17 @@ export const resumeSchema = z
     fileUrl: z.string(),
     createdAt: z.string(),
   })
-  .openapi("Resume")
+  .openapi("Resume");
 
 export const createResumeBodySchema = z
   .object({
     title: z.string().min(1).max(200),
     fileUrl: z.url(),
   })
-  .openapi("CreateResumeBody")
+  .openapi("CreateResumeBody");
 
 export const resumeIdParamSchema = z
   .object({
     id: z.string().min(1),
   })
-  .openapi("ResumeIdParam")
+  .openapi("ResumeIdParam");

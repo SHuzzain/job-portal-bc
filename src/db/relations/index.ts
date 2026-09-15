@@ -1,22 +1,33 @@
-import { relations } from "drizzle-orm"
-import { invitation, member, organization, organizationRole, session } from "../../auth/schema.ts"
-import { application } from "../../features/applications/applications.schema.ts"
-import { interview } from "../../features/interviews/interviews.schema.ts"
-import { notification } from "../../features/notifications/notifications.schema.ts"
-import { resume } from "../../features/resumes/resumes.schema.ts"
-import { seekerProfile } from "../../features/seeker-profiles/seeker-profiles.schema.ts"
-import { user } from "../../features/users/users.schema.ts"
-import { tvetAttendance, tvetRfp, tvetSession } from "../../features/tvet/tvet.schema.ts"
-import { vacancy } from "../../features/vacancies/vacancies.schema.ts"
+import { relations } from "drizzle-orm";
 
-export { usersRelations } from "./users.ts"
+import {
+  invitation,
+  member,
+  organization,
+  organizationRole,
+  session,
+} from "../../auth/schema.ts";
+import { application } from "../../features/applications/applications.schema.ts";
+import { interview } from "../../features/interviews/interviews.schema.ts";
+import { notification } from "../../features/notifications/notifications.schema.ts";
+import { resume } from "../../features/resumes/resumes.schema.ts";
+import { seekerProfile } from "../../features/seeker-profiles/seeker-profiles.schema.ts";
+import {
+  tvetAttendance,
+  tvetRfp,
+  tvetSession,
+} from "../../features/tvet/tvet.schema.ts";
+import { user } from "../../features/users/users.schema.ts";
+import { vacancy } from "../../features/vacancies/vacancies.schema.ts";
+
+export { usersRelations } from "./users.ts";
 
 export const sessionsRelations = relations(session, ({ one }) => ({
   user: one(user, {
     fields: [session.userId],
     references: [user.id],
   }),
-}))
+}));
 
 export const organizationsRelations = relations(organization, ({ many }) => ({
   members: many(member),
@@ -25,7 +36,7 @@ export const organizationsRelations = relations(organization, ({ many }) => ({
   vacancies: many(vacancy),
   tvetRfps: many(tvetRfp),
   tvetSessions: many(tvetSession),
-}))
+}));
 
 export const tvetRfpsRelations = relations(tvetRfp, ({ one, many }) => ({
   organization: one(organization, {
@@ -33,19 +44,22 @@ export const tvetRfpsRelations = relations(tvetRfp, ({ one, many }) => ({
     references: [organization.id],
   }),
   sessions: many(tvetSession),
-}))
+}));
 
-export const tvetSessionsRelations = relations(tvetSession, ({ one, many }) => ({
-  rfp: one(tvetRfp, {
-    fields: [tvetSession.rfpId],
-    references: [tvetRfp.id],
-  }),
-  organization: one(organization, {
-    fields: [tvetSession.organizationId],
-    references: [organization.id],
-  }),
-  attendance: many(tvetAttendance),
-}))
+export const tvetSessionsRelations = relations(
+  tvetSession,
+  ({ one, many }) => ({
+    rfp: one(tvetRfp, {
+      fields: [tvetSession.rfpId],
+      references: [tvetRfp.id],
+    }),
+    organization: one(organization, {
+      fields: [tvetSession.organizationId],
+      references: [organization.id],
+    }),
+    attendance: many(tvetAttendance),
+  })
+);
 
 export const tvetAttendanceRelations = relations(tvetAttendance, ({ one }) => ({
   session: one(tvetSession, {
@@ -56,7 +70,7 @@ export const tvetAttendanceRelations = relations(tvetAttendance, ({ one }) => ({
     fields: [tvetAttendance.userId],
     references: [user.id],
   }),
-}))
+}));
 
 export const vacanciesRelations = relations(vacancy, ({ one, many }) => ({
   organization: one(organization, {
@@ -64,14 +78,14 @@ export const vacanciesRelations = relations(vacancy, ({ one, many }) => ({
     references: [organization.id],
   }),
   applications: many(application),
-}))
+}));
 
 export const seekerProfilesRelations = relations(seekerProfile, ({ one }) => ({
   user: one(user, {
     fields: [seekerProfile.userId],
     references: [user.id],
   }),
-}))
+}));
 
 export const resumesRelations = relations(resume, ({ one, many }) => ({
   user: one(user, {
@@ -79,44 +93,50 @@ export const resumesRelations = relations(resume, ({ one, many }) => ({
     references: [user.id],
   }),
   applications: many(application),
-}))
+}));
 
 export const notificationsRelations = relations(notification, ({ one }) => ({
   user: one(user, {
     fields: [notification.userId],
     references: [user.id],
   }),
-}))
+}));
 
-export const applicationsRelations = relations(application, ({ one, many }) => ({
-  user: one(user, {
-    fields: [application.userId],
-    references: [user.id],
-  }),
-  vacancy: one(vacancy, {
-    fields: [application.vacancyId],
-    references: [vacancy.id],
-  }),
-  resume: one(resume, {
-    fields: [application.resumeId],
-    references: [resume.id],
-  }),
-  interviews: many(interview),
-}))
+export const applicationsRelations = relations(
+  application,
+  ({ one, many }) => ({
+    user: one(user, {
+      fields: [application.userId],
+      references: [user.id],
+    }),
+    vacancy: one(vacancy, {
+      fields: [application.vacancyId],
+      references: [vacancy.id],
+    }),
+    resume: one(resume, {
+      fields: [application.resumeId],
+      references: [resume.id],
+    }),
+    interviews: many(interview),
+  })
+);
 
 export const interviewsRelations = relations(interview, ({ one }) => ({
   application: one(application, {
     fields: [interview.applicationId],
     references: [application.id],
   }),
-}))
+}));
 
-export const organizationRolesRelations = relations(organizationRole, ({ one }) => ({
-  organization: one(organization, {
-    fields: [organizationRole.organizationId],
-    references: [organization.id],
-  }),
-}))
+export const organizationRolesRelations = relations(
+  organizationRole,
+  ({ one }) => ({
+    organization: one(organization, {
+      fields: [organizationRole.organizationId],
+      references: [organization.id],
+    }),
+  })
+);
 
 export const membersRelations = relations(member, ({ one }) => ({
   organization: one(organization, {
@@ -127,7 +147,7 @@ export const membersRelations = relations(member, ({ one }) => ({
     fields: [member.userId],
     references: [user.id],
   }),
-}))
+}));
 
 export const invitationsRelations = relations(invitation, ({ one }) => ({
   organization: one(organization, {
@@ -138,4 +158,4 @@ export const invitationsRelations = relations(invitation, ({ one }) => ({
     fields: [invitation.inviterId],
     references: [user.id],
   }),
-}))
+}));

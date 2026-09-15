@@ -25,7 +25,7 @@ function date(value: string) {
 
 export async function createClaimPdf(
   kind: "PAYMENT_VOUCHER" | "BORANG_AKUAN",
-  data: ClaimPdfData,
+  data: ClaimPdfData
 ) {
   const document = await PDFDocument.create();
   const page = document.addPage([595, 842]);

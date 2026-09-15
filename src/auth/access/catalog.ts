@@ -25,10 +25,10 @@ export const RESOURCES = {
   org_member: ["view", "invite", "update_role", "remove"],
   org_role: ["view", "create", "update", "delete"],
   notification: ["view", "mark_read"],
-} as const
+} as const;
 
-export type ResourceKey = keyof typeof RESOURCES
-export type PermissionMap = Record<string, string[]>
+export type ResourceKey = keyof typeof RESOURCES;
+export type PermissionMap = Record<string, string[]>;
 
 /** Grouping used by the permission matrix UI. */
 export const MODULES = [
@@ -56,7 +56,12 @@ export const MODULES = [
   {
     module: "pasak",
     scope: "platform",
-    resources: ["company_review", "vacancy_review", "tvet_capability", "claim_review"],
+    resources: [
+      "company_review",
+      "vacancy_review",
+      "tvet_capability",
+      "claim_review",
+    ],
   },
   {
     module: "administration",
@@ -74,16 +79,16 @@ export const MODULES = [
     resources: ["notification"],
   },
 ] as const satisfies readonly {
-  module: string
-  scope: "platform" | "organization" | "both"
-  resources: readonly ResourceKey[]
-}[]
+  module: string;
+  scope: "platform" | "organization" | "both";
+  resources: readonly ResourceKey[];
+}[];
 
 function pick<K extends ResourceKey>(keys: readonly K[]) {
   return Object.fromEntries(keys.map((key) => [key, RESOURCES[key]])) as Pick<
     typeof RESOURCES,
     K
-  >
+  >;
 }
 
 export const PLATFORM_RESOURCE_KEYS = [
@@ -108,7 +113,7 @@ export const PLATFORM_RESOURCE_KEYS = [
   "org_member",
   "org_role",
   "notification",
-] as const
+] as const;
 
 export const ORGANIZATION_RESOURCE_KEYS = [
   "company",
@@ -121,50 +126,53 @@ export const ORGANIZATION_RESOURCE_KEYS = [
   "org_member",
   "org_role",
   "notification",
-] as const
+] as const;
 
-export const platformResourceStatements = pick(PLATFORM_RESOURCE_KEYS)
-export const organizationResourceStatements = pick(ORGANIZATION_RESOURCE_KEYS)
+export const platformResourceStatements = pick(PLATFORM_RESOURCE_KEYS);
+export const organizationResourceStatements = pick(ORGANIZATION_RESOURCE_KEYS);
 
 export function actionsFor(resource: string): readonly string[] {
-  return RESOURCES[resource as ResourceKey] ?? []
+  return RESOURCES[resource as ResourceKey] ?? [];
 }
 
 /** Every action of every resource in the given statement set. */
 export function fullPermissions(
-  statements: Record<string, readonly string[]>,
+  statements: Record<string, readonly string[]>
 ): PermissionMap {
   return Object.fromEntries(
-    Object.entries(statements).map(([resource, actions]) => [resource, [...actions]]),
-  )
+    Object.entries(statements).map(([resource, actions]) => [
+      resource,
+      [...actions],
+    ])
+  );
 }
 
 /** Drops resources and actions that are not part of the given statement set. */
 export function sanitizePermissions(
   permissions: PermissionMap | null | undefined,
-  statements: Record<string, readonly string[]>,
+  statements: Record<string, readonly string[]>
 ): PermissionMap {
-  const result: PermissionMap = {}
+  const result: PermissionMap = {};
   if (!permissions) {
-    return result
+    return result;
   }
   for (const [resource, actions] of Object.entries(permissions)) {
-    const allowed = statements[resource]
+    const allowed = statements[resource];
     if (!allowed || !Array.isArray(actions)) {
-      continue
+      continue;
     }
-    const kept = allowed.filter((action) => actions.includes(action))
+    const kept = allowed.filter((action) => actions.includes(action));
     if (kept.length > 0) {
-      result[resource] = kept
+      result[resource] = kept;
     }
   }
-  return result
+  return result;
 }
 
 export function hasPermission(
   permissions: PermissionMap | null | undefined,
   resource: string,
-  action: string,
+  action: string
 ) {
-  return Boolean(permissions?.[resource]?.includes(action))
+  return Boolean(permissions?.[resource]?.includes(action));
 }

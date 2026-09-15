@@ -11,7 +11,15 @@
     "allowImportingTsExtensions": true,
     "noEmit": true,
     "types": ["node"],
+    "paths": {
+      "@/*": ["./src/*"]
+    },
     "plugins": [{ "name": "workflow" }]
   },
-  "include": ["src/**/*.ts", "plugins/**/*.ts", "drizzle.config.ts", "nitro.config.ts"]
+  "include": [
+    "src/**/*.ts",
+    "plugins/**/*.ts",
+    "drizzle.config.ts",
+    "nitro.config.ts"
+  ]
 }

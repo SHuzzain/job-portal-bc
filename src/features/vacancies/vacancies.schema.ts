@@ -1,6 +1,7 @@
-import { integer, pgTable, text } from "drizzle-orm/pg-core"
-import { organization } from "../../auth/schema.ts"
-import { timestamps } from "../../lib/columns.ts"
+import { integer, pgTable, text } from "drizzle-orm/pg-core";
+
+import { organization } from "../../auth/schema.ts";
+import { timestamps } from "../../lib/columns.ts";
 
 export const vacancy = pgTable("vacancy", {
   id: text("id").primaryKey(),
@@ -18,4 +19,4 @@ export const vacancy = pgTable("vacancy", {
   status: text("status").notNull().default("PENDING_APPROVAL"),
   reviewNotes: text("review_notes"),
   ...timestamps,
-})
+});

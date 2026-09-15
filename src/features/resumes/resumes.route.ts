@@ -1,15 +1,16 @@
-import { createRoute } from "@hono/zod-openapi"
-import * as HttpStatusCodes from "stoker/http-status-codes"
-import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers"
-import { requirePermission } from "../../auth/middleware.ts"
-import { createRouter } from "../../lib/create-app.ts"
-import { jsonErrors } from "../../lib/http-errors.ts"
-import { createResume, deleteResume, listMine } from "./resumes.controller.ts"
+import { createRoute } from "@hono/zod-openapi";
+import * as HttpStatusCodes from "stoker/http-status-codes";
+import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
+
+import { requirePermission } from "../../auth/middleware.ts";
+import { createRouter } from "../../lib/create-app.ts";
+import { jsonErrors } from "../../lib/http-errors.ts";
+import { createResume, deleteResume, listMine } from "./resumes.controller.ts";
 import {
   createResumeBodySchema,
   resumeIdParamSchema,
   resumeSchema,
-} from "./validator/resume.schema.ts"
+} from "./validator/resume.schema.ts";
 
 export const listMineRoute = createRoute({
   method: "get",
@@ -21,10 +22,10 @@ export const listMineRoute = createRoute({
     ...jsonErrors(
       HttpStatusCodes.UNAUTHORIZED,
       HttpStatusCodes.FORBIDDEN,
-      HttpStatusCodes.NOT_FOUND,
+      HttpStatusCodes.NOT_FOUND
     ),
   },
-})
+});
 
 export const createResumeRoute = createRoute({
   method: "post",
@@ -39,10 +40,10 @@ export const createResumeRoute = createRoute({
     ...jsonErrors(
       HttpStatusCodes.UNAUTHORIZED,
       HttpStatusCodes.FORBIDDEN,
-      HttpStatusCodes.NOT_FOUND,
+      HttpStatusCodes.NOT_FOUND
     ),
   },
-})
+});
 
 export const deleteResumeRoute = createRoute({
   method: "delete",
@@ -59,18 +60,18 @@ export const deleteResumeRoute = createRoute({
     ...jsonErrors(
       HttpStatusCodes.UNAUTHORIZED,
       HttpStatusCodes.FORBIDDEN,
-      HttpStatusCodes.NOT_FOUND,
+      HttpStatusCodes.NOT_FOUND
     ),
   },
-})
+});
 
-export type ListMineRoute = typeof listMineRoute
-export type CreateResumeRoute = typeof createResumeRoute
-export type DeleteResumeRoute = typeof deleteResumeRoute
+export type ListMineRoute = typeof listMineRoute;
+export type CreateResumeRoute = typeof createResumeRoute;
+export type DeleteResumeRoute = typeof deleteResumeRoute;
 
 const resumes = createRouter()
   .openapi(listMineRoute, listMine)
   .openapi(createResumeRoute, createResume)
-  .openapi(deleteResumeRoute, deleteResume)
+  .openapi(deleteResumeRoute, deleteResume);
 
-export default resumes
+export default resumes;

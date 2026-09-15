@@ -1,4 +1,4 @@
-import type { TranslationDictionary } from "@better-auth/i18n"
+import type { TranslationDictionary } from "@better-auth/i18n";
 
 export const ms: TranslationDictionary = {
   USER_NOT_FOUND: "Pengguna tidak dijumpai",
@@ -20,13 +20,15 @@ export const ms: TranslationDictionary = {
   PASSWORD_TOO_SHORT: "Kata laluan terlalu pendek",
   PASSWORD_TOO_LONG: "Kata laluan terlalu panjang",
   USER_ALREADY_EXISTS: "Pengguna sudah wujud",
-  USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL: "Pengguna sudah wujud. Gunakan e-mel lain.",
+  USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL:
+    "Pengguna sudah wujud. Gunakan e-mel lain.",
   EMAIL_CAN_NOT_BE_UPDATED: "E-mel tidak boleh dikemas kini",
   CREDENTIAL_ACCOUNT_NOT_FOUND: "Akaun kelayakan tidak dijumpai",
   SESSION_EXPIRED: "Sesi tamat. Log masuk semula untuk meneruskan.",
   FAILED_TO_UNLINK_LAST_ACCOUNT: "Anda tidak boleh nyahpaut akaun terakhir",
   ACCOUNT_NOT_FOUND: "Akaun tidak dijumpai",
-  USER_ALREADY_HAS_PASSWORD: "Pengguna sudah mempunyai kata laluan. Berikan kata laluan itu untuk memadam akaun.",
+  USER_ALREADY_HAS_PASSWORD:
+    "Pengguna sudah mempunyai kata laluan. Berikan kata laluan itu untuk memadam akaun.",
   VERIFICATION_EMAIL_NOT_ENABLED: "E-mel pengesahan tidak diaktifkan",
   EMAIL_ALREADY_VERIFIED: "E-mel sudah disahkan",
   EMAIL_MISMATCH: "E-mel tidak sepadan",
@@ -35,4 +37,4 @@ export const ms: TranslationDictionary = {
   VALIDATION_ERROR: "Ralat pengesahan",
   MISSING_FIELD: "Medan diperlukan",
   PASSWORD_ALREADY_SET: "Pengguna sudah menetapkan kata laluan",
-}
+};

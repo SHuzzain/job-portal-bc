@@ -1,13 +1,14 @@
-import { drizzleAdapter } from "@better-auth/drizzle-adapter"
-import { betterAuth } from "better-auth"
-import { db } from "../db/index.ts"
-import * as schema from "../db/schema.ts"
-import { env } from "../env.ts"
-import { authPlugins } from "./plugins/index.ts"
+import { drizzleAdapter } from "@better-auth/drizzle-adapter";
+import { betterAuth } from "better-auth";
 
-const signupRoles = new Set(["jobseeker", "employer"])
+import { db } from "../db/index.ts";
+import * as schema from "../db/schema.ts";
+import { env } from "../env.ts";
+import { authPlugins } from "./plugins/index.ts";
 
-export const AUTH_COOKIE_PREFIX = "pasak-auth"
+const signupRoles = new Set(["jobseeker", "employer"]);
+
+export const AUTH_COOKIE_PREFIX = "pasak-auth";
 
 export const auth = betterAuth({
   baseURL: env.BETTER_AUTH_URL,
@@ -62,14 +63,14 @@ export const auth = betterAuth({
       create: {
         before: async (user, ctx) => {
           const requested = (ctx?.body as { accountType?: unknown } | undefined)
-            ?.accountType
+            ?.accountType;
           if (typeof requested === "string" && signupRoles.has(requested)) {
-            return { data: { ...user, role: requested } }
+            return { data: { ...user, role: requested } };
           }
-          return { data: user }
+          return { data: user };
         },
       },
     },
   },
   plugins: authPlugins,
-})
+});

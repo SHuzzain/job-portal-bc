@@ -1,5 +1,5 @@
-import { multiSession } from "better-auth/plugins"
+import { multiSession } from "better-auth/plugins";
 
 export const multiSessionPlugin = multiSession({
   maximumSessions: 5,
-})
+});

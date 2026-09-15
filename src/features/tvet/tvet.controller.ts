@@ -1,4 +1,5 @@
 import * as HttpStatusCodes from "stoker/http-status-codes";
+
 import { authedSession, organizationId } from "../../lib/session.ts";
 import type { AppRouteHandler } from "../../lib/types.ts";
 import type {
@@ -27,7 +28,7 @@ function mapError(error: unknown) {
 export const listRfps: AppRouteHandler<ListRfpsRoute> = async (c) => {
   return c.json(
     await tvetService.listRfps(organizationId(c)),
-    HttpStatusCodes.OK,
+    HttpStatusCodes.OK
   );
 };
 
@@ -35,7 +36,7 @@ export const createRfp: AppRouteHandler<CreateRfpRoute> = async (c) => {
   try {
     return c.json(
       await tvetService.createRfp(organizationId(c), c.req.valid("json")),
-      HttpStatusCodes.CREATED,
+      HttpStatusCodes.CREATED
     );
   } catch (error) {
     const mapped = mapError(error);
@@ -48,7 +49,7 @@ export const updateRfp: AppRouteHandler<UpdateRfpRoute> = async (c) => {
     const { id } = c.req.valid("param");
     return c.json(
       await tvetService.updateRfp(organizationId(c), id, c.req.valid("json")),
-      HttpStatusCodes.OK,
+      HttpStatusCodes.OK
     );
   } catch (error) {
     const mapped = mapError(error);
@@ -60,7 +61,7 @@ export const listSessions: AppRouteHandler<ListSessionsRoute> = async (c) => {
   const { rfpId } = c.req.valid("query");
   return c.json(
     await tvetService.listSessions(organizationId(c), rfpId),
-    HttpStatusCodes.OK,
+    HttpStatusCodes.OK
   );
 };
 
@@ -68,7 +69,7 @@ export const createSession: AppRouteHandler<CreateSessionRoute> = async (c) => {
   try {
     return c.json(
       await tvetService.createSession(organizationId(c), c.req.valid("json")),
-      HttpStatusCodes.CREATED,
+      HttpStatusCodes.CREATED
     );
   } catch (error) {
     const mapped = mapError(error);
@@ -81,7 +82,7 @@ export const getSession: AppRouteHandler<GetSessionRoute> = async (c) => {
     const { id } = c.req.valid("param");
     return c.json(
       await tvetService.getSession(organizationId(c), id),
-      HttpStatusCodes.OK,
+      HttpStatusCodes.OK
     );
   } catch (error) {
     const mapped = mapError(error);
@@ -95,7 +96,7 @@ export const scan: AppRouteHandler<ScanRoute> = async (c) => {
   try {
     return c.json(
       await tvetService.scan(session.user.id, c.req.valid("json").barcode),
-      HttpStatusCodes.CREATED,
+      HttpStatusCodes.CREATED
     );
   } catch (error) {
     const mapped = mapError(error);
@@ -104,12 +105,12 @@ export const scan: AppRouteHandler<ScanRoute> = async (c) => {
 };
 
 export const listMyAttendance: AppRouteHandler<ListMyAttendanceRoute> = async (
-  c,
+  c
 ) => {
   const session = authedSession(c);
   return c.json(
     await tvetService.listMyAttendance(session.user.id),
-    HttpStatusCodes.OK,
+    HttpStatusCodes.OK
   );
 };
 
@@ -120,7 +121,7 @@ export const submitSurvey: AppRouteHandler<SubmitSurveyRoute> = async (c) => {
   try {
     return c.json(
       await tvetService.submitSurvey(session.user.id, id, c.req.valid("json")),
-      HttpStatusCodes.OK,
+      HttpStatusCodes.OK
     );
   } catch (error) {
     const mapped = mapError(error);
@@ -129,7 +130,7 @@ export const submitSurvey: AppRouteHandler<SubmitSurveyRoute> = async (c) => {
 };
 
 export const getCertificate: AppRouteHandler<GetCertificateRoute> = async (
-  c,
+  c
 ) => {
   const session = authedSession(c);
   const { id } = c.req.valid("param");
@@ -137,7 +138,7 @@ export const getCertificate: AppRouteHandler<GetCertificateRoute> = async (
   try {
     return c.json(
       await tvetService.getCertificate(session.user.id, id),
-      HttpStatusCodes.OK,
+      HttpStatusCodes.OK
     );
   } catch (error) {
     const mapped = mapError(error);

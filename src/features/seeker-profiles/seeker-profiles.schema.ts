@@ -1,6 +1,7 @@
-import { boolean, integer, pgTable, text } from "drizzle-orm/pg-core"
-import { user } from "../users/users.schema.ts"
-import { timestamps } from "../../lib/columns.ts"
+import { boolean, integer, pgTable, text } from "drizzle-orm/pg-core";
+
+import { timestamps } from "../../lib/columns.ts";
+import { user } from "../users/users.schema.ts";
 
 export const seekerProfile = pgTable("seeker_profile", {
   id: text("id").primaryKey(),
@@ -22,4 +23,4 @@ export const seekerProfile = pgTable("seeker_profile", {
   isMalaysian: boolean("is_malaysian").notNull().default(false),
   hasWorkPermit: boolean("has_work_permit").notNull().default(false),
   ...timestamps,
-})
+});

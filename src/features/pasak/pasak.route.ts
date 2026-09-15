@@ -1,29 +1,14 @@
-import { createRoute } from "@hono/zod-openapi"
-import * as HttpStatusCodes from "stoker/http-status-codes"
-import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers"
-import { requirePermission, requirePermissionFor } from "../../auth/middleware.ts"
+import { createRoute } from "@hono/zod-openapi";
+import * as HttpStatusCodes from "stoker/http-status-codes";
+import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
 
-const reviewActions: Record<string, string> = {
-  APPROVE: "approve",
-  REJECT: "reject",
-  RETURN_FOR_CORRECTION: "return",
-}
-
-const statusActions: Record<string, string> = {
-  APPROVED: "approve",
-  REJECTED: "reject",
-}
-
-function reviewAction(body: Record<string, unknown>) {
-  return typeof body.action === "string" ? (reviewActions[body.action] ?? null) : null
-}
-
-function statusAction(body: Record<string, unknown>) {
-  return typeof body.status === "string" ? (statusActions[body.status] ?? null) : null
-}
-import { createRouter } from "../../lib/create-app.ts"
-import { errorResponses } from "../../lib/http-errors.ts"
-import { vacancySchema } from "../vacancies/validator/vacancy.schema.ts"
+import {
+  requirePermission,
+  requirePermissionFor,
+} from "../../auth/middleware.ts";
+import { createRouter } from "../../lib/create-app.ts";
+import { errorResponses } from "../../lib/http-errors.ts";
+import { vacancySchema } from "../vacancies/validator/vacancy.schema.ts";
 import {
   listCompanies,
   listEmployers,
@@ -33,7 +18,7 @@ import {
   setCompanyStatus,
   setTvetCapability,
   setVacancyStatus,
-} from "./pasak.controller.ts"
+} from "./pasak.controller.ts";
 import {
   companyIdParamSchema,
   companySchema,
@@ -46,7 +31,30 @@ import {
   setTvetCapabilityBodySchema,
   setVacancyStatusBodySchema,
   vacancyIdParamSchema,
-} from "./validator/pasak.schema.ts"
+} from "./validator/pasak.schema.ts";
+
+const reviewActions: Record<string, string> = {
+  APPROVE: "approve",
+  REJECT: "reject",
+  RETURN_FOR_CORRECTION: "return",
+};
+
+const statusActions: Record<string, string> = {
+  APPROVED: "approve",
+  REJECTED: "reject",
+};
+
+function reviewAction(body: Record<string, unknown>) {
+  return typeof body.action === "string"
+    ? (reviewActions[body.action] ?? null)
+    : null;
+}
+
+function statusAction(body: Record<string, unknown>) {
+  return typeof body.status === "string"
+    ? (statusActions[body.status] ?? null)
+    : null;
+}
 
 export const listCompaniesRoute = createRoute({
   method: "get",
@@ -60,7 +68,7 @@ export const listCompaniesRoute = createRoute({
     [HttpStatusCodes.OK]: jsonContent(companySchema.array(), "Companies"),
     ...errorResponses,
   },
-})
+});
 
 export const setCompanyStatusRoute = createRoute({
   method: "patch",
@@ -75,7 +83,7 @@ export const setCompanyStatusRoute = createRoute({
     [HttpStatusCodes.OK]: jsonContent(companySchema, "Updated company"),
     ...errorResponses,
   },
-})
+});
 
 export const listVacanciesRoute = createRoute({
   method: "get",
@@ -89,7 +97,7 @@ export const listVacanciesRoute = createRoute({
     [HttpStatusCodes.OK]: jsonContent(vacancySchema.array(), "Vacancies"),
     ...errorResponses,
   },
-})
+});
 
 export const reviewCompanyRoute = createRoute({
   method: "post",
@@ -104,7 +112,7 @@ export const reviewCompanyRoute = createRoute({
     [HttpStatusCodes.OK]: jsonContent(companySchema, "Reviewed company"),
     ...errorResponses,
   },
-})
+});
 
 export const reviewVacancyRoute = createRoute({
   method: "post",
@@ -119,7 +127,7 @@ export const reviewVacancyRoute = createRoute({
     [HttpStatusCodes.OK]: jsonContent(vacancySchema, "Reviewed vacancy"),
     ...errorResponses,
   },
-})
+});
 
 export const setVacancyStatusRoute = createRoute({
   method: "patch",
@@ -134,7 +142,7 @@ export const setVacancyStatusRoute = createRoute({
     [HttpStatusCodes.OK]: jsonContent(vacancySchema, "Updated vacancy"),
     ...errorResponses,
   },
-})
+});
 
 export const listEmployersRoute = createRoute({
   method: "get",
@@ -142,10 +150,13 @@ export const listEmployersRoute = createRoute({
   tags: ["PASAK"],
   middleware: [requirePermission("tvet_capability", "view")],
   responses: {
-    [HttpStatusCodes.OK]: jsonContent(pasakEmployerSchema.array(), "Employer accounts"),
+    [HttpStatusCodes.OK]: jsonContent(
+      pasakEmployerSchema.array(),
+      "Employer accounts"
+    ),
     ...errorResponses,
   },
-})
+});
 
 export const setTvetCapabilityRoute = createRoute({
   method: "patch",
@@ -157,7 +168,7 @@ export const setTvetCapabilityRoute = createRoute({
         ? body.hasTvetCapability
           ? "grant"
           : "revoke"
-        : null,
+        : null
     ),
   ],
   request: {
@@ -165,19 +176,22 @@ export const setTvetCapabilityRoute = createRoute({
     body: jsonContentRequired(setTvetCapabilityBodySchema, "TVET capability"),
   },
   responses: {
-    [HttpStatusCodes.OK]: jsonContent(pasakEmployerSchema, "Updated employer TVET capability"),
+    [HttpStatusCodes.OK]: jsonContent(
+      pasakEmployerSchema,
+      "Updated employer TVET capability"
+    ),
     ...errorResponses,
   },
-})
+});
 
-export type ListCompaniesRoute = typeof listCompaniesRoute
-export type SetCompanyStatusRoute = typeof setCompanyStatusRoute
-export type ListVacanciesRoute = typeof listVacanciesRoute
-export type ReviewCompanyRoute = typeof reviewCompanyRoute
-export type ReviewVacancyRoute = typeof reviewVacancyRoute
-export type SetVacancyStatusRoute = typeof setVacancyStatusRoute
-export type ListEmployersRoute = typeof listEmployersRoute
-export type SetTvetCapabilityRoute = typeof setTvetCapabilityRoute
+export type ListCompaniesRoute = typeof listCompaniesRoute;
+export type SetCompanyStatusRoute = typeof setCompanyStatusRoute;
+export type ListVacanciesRoute = typeof listVacanciesRoute;
+export type ReviewCompanyRoute = typeof reviewCompanyRoute;
+export type ReviewVacancyRoute = typeof reviewVacancyRoute;
+export type SetVacancyStatusRoute = typeof setVacancyStatusRoute;
+export type ListEmployersRoute = typeof listEmployersRoute;
+export type SetTvetCapabilityRoute = typeof setTvetCapabilityRoute;
 
 const pasak = createRouter()
   .openapi(listCompaniesRoute, listCompanies)
@@ -187,6 +201,6 @@ const pasak = createRouter()
   .openapi(reviewVacancyRoute, reviewVacancy)
   .openapi(setVacancyStatusRoute, setVacancyStatus)
   .openapi(listEmployersRoute, listEmployers)
-  .openapi(setTvetCapabilityRoute, setTvetCapability)
+  .openapi(setTvetCapabilityRoute, setTvetCapability);
 
-export default pasak
+export default pasak;

@@ -1,4 +1,4 @@
-import { z } from "@hono/zod-openapi"
+import { z } from "@hono/zod-openapi";
 
 export const seekerProfileSchema = z
   .object({
@@ -19,7 +19,7 @@ export const seekerProfileSchema = z
     hasWorkPermit: z.boolean(),
     complete: z.boolean(),
   })
-  .openapi("SeekerProfile")
+  .openapi("SeekerProfile");
 
 export const updateSeekerProfileBodySchema = z
   .object({
@@ -33,8 +33,10 @@ export const updateSeekerProfileBodySchema = z
     yearsOfExperience: z.number().int().min(0).max(60).optional(),
     skills: z.string().min(1).max(2000).optional(),
     preferredLocation: z.string().min(1).max(120).optional(),
-    preferredEmploymentType: z.enum(["FULL_TIME", "PART_TIME", "CONTRACT", "INTERNSHIP"]).optional(),
+    preferredEmploymentType: z
+      .enum(["FULL_TIME", "PART_TIME", "CONTRACT", "INTERNSHIP"])
+      .optional(),
     isMalaysian: z.boolean().optional(),
     hasWorkPermit: z.boolean().optional(),
   })
-  .openapi("UpdateSeekerProfileBody")
+  .openapi("UpdateSeekerProfileBody");

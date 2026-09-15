@@ -6,6 +6,7 @@ import {
   timestamp,
   unique,
 } from "drizzle-orm/pg-core";
+
 import { organization } from "../../auth/schema.ts";
 import { timestamps } from "../../lib/columns.ts";
 import { tvetSession } from "../tvet/tvet.schema.ts";
@@ -43,5 +44,5 @@ export const tvetClaim = pgTable(
   },
   (table) => [
     unique("tvet_claims_course_provider").on(table.courseId, table.employerId),
-  ],
+  ]
 );

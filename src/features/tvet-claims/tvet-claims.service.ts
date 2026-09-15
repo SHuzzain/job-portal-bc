@@ -5,7 +5,7 @@ import * as repository from "./tvet-claims.repository.ts";
 export class TvetClaimError extends Error {
   constructor(
     public status: 400 | 403 | 404 | 409,
-    message: string,
+    message: string
   ) {
     super(message);
     this.name = "TvetClaimError";
@@ -68,7 +68,7 @@ export async function submitClaim(
     courseId: string;
     claimAmount: string;
     borangTuntutanUrl: string;
-  },
+  }
 ) {
   const course = await repository.findCourse(data.courseId);
   if (!course || course.organizationId !== employerId) {
@@ -78,7 +78,7 @@ export async function submitClaim(
   if (Number.isNaN(endTime) || endTime > Date.now()) {
     throw new TvetClaimError(
       403,
-      "Claims are only allowed after the course ends",
+      "Claims are only allowed after the course ends"
     );
   }
 
@@ -114,7 +114,7 @@ export async function listPasakClaims() {
 export async function reviewClaim(
   id: string,
   action: "APPROVE" | "REJECT",
-  comments?: string,
+  comments?: string
 ) {
   await claimOr404(id);
   const status = action === "APPROVE" ? "FINANCE_APPROVED" : "REJECTED";
@@ -143,7 +143,7 @@ export async function reviewClaim(
 export async function uploadSigned(
   employerId: string,
   id: string,
-  signedBorangAkuanUrl: string,
+  signedBorangAkuanUrl: string
 ) {
   await ownedClaim(employerId, id);
   const updated = await repository.transitionClaim(id, "FINANCE_APPROVED", {
@@ -153,7 +153,7 @@ export async function uploadSigned(
   if (!updated) {
     throw new TvetClaimError(
       409,
-      "Signed acknowledgement is only accepted after finance approval",
+      "Signed acknowledgement is only accepted after finance approval"
     );
   }
   return toClaim(await claimOr404(id));
@@ -168,7 +168,7 @@ export async function finalizePayment(id: string) {
   if (!updated) {
     throw new TvetClaimError(
       409,
-      "Payment can only be finalized after the signed acknowledgement is submitted",
+      "Payment can only be finalized after the signed acknowledgement is submitted"
     );
   }
   await notificationsService.notifyOrganization(existing.claim.employerId, {
@@ -185,7 +185,7 @@ export async function finalizePayment(id: string) {
 export async function downloadDocument(
   id: string,
   kind: "PAYMENT_VOUCHER" | "BORANG_AKUAN",
-  employerId?: string,
+  employerId?: string
 ) {
   const row = employerId
     ? await ownedClaim(employerId, id)
@@ -197,7 +197,7 @@ export async function downloadDocument(
   ) {
     throw new TvetClaimError(
       403,
-      "Documents are available after finance approval",
+      "Documents are available after finance approval"
     );
   }
   return createClaimPdf(kind, {

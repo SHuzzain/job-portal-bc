@@ -1,6 +1,7 @@
 import { createRoute, z } from "@hono/zod-openapi";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
+
 import {
   requirePermission,
   requireTvetPermission,
@@ -86,7 +87,7 @@ export const listSessionsRoute = createRoute({
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
       tvetSessionSchema.array(),
-      "Company sessions",
+      "Company sessions"
     ),
     ...errorResponses,
   },
@@ -103,7 +104,7 @@ export const createSessionRoute = createRoute({
   responses: {
     [HttpStatusCodes.CREATED]: jsonContent(
       tvetSessionSchema,
-      "Created session",
+      "Created session"
     ),
     ...errorResponses,
   },
@@ -120,7 +121,7 @@ export const getSessionRoute = createRoute({
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
       tvetSessionDetailSchema,
-      "Session with attendance",
+      "Session with attendance"
     ),
     ...errorResponses,
   },
@@ -137,7 +138,7 @@ export const scanRoute = createRoute({
   responses: {
     [HttpStatusCodes.CREATED]: jsonContent(
       tvetAttendanceSchema,
-      "Attendance recorded",
+      "Attendance recorded"
     ),
     ...errorResponses,
   },
@@ -151,7 +152,7 @@ export const listMyAttendanceRoute = createRoute({
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
       tvetAttendanceSchema.array(),
-      "My attendance",
+      "My attendance"
     ),
     ...errorResponses,
   },
@@ -169,7 +170,7 @@ export const submitSurveyRoute = createRoute({
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
       tvetCertificateSchema,
-      "Certificate unlocked",
+      "Certificate unlocked"
     ),
     ...errorResponses,
   },
@@ -186,7 +187,7 @@ export const getCertificateRoute = createRoute({
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
       tvetCertificateSchema,
-      "Certificate metadata",
+      "Certificate metadata"
     ),
     ...errorResponses,
   },

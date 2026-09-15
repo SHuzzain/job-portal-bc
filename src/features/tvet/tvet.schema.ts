@@ -1,7 +1,8 @@
 import { integer, pgTable, text, timestamp, unique } from "drizzle-orm/pg-core";
+
 import { organization } from "../../auth/schema.ts";
-import { user } from "../users/users.schema.ts";
 import { timestamps } from "../../lib/columns.ts";
+import { user } from "../users/users.schema.ts";
 
 export const tvetRfp = pgTable("tvet_rfp", {
   id: text("id").primaryKey(),
@@ -54,5 +55,5 @@ export const tvetAttendance = pgTable(
   (table) => [
     unique("tvet_attendance_session_user").on(table.sessionId, table.userId),
     unique("tvet_attendance_certificate_code").on(table.certificateCode),
-  ],
+  ]
 );

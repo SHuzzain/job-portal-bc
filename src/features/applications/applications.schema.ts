@@ -1,8 +1,9 @@
-import { pgTable, text, unique } from "drizzle-orm/pg-core"
-import { user } from "../users/users.schema.ts"
-import { vacancy } from "../vacancies/vacancies.schema.ts"
-import { resume } from "../resumes/resumes.schema.ts"
-import { timestamps } from "../../lib/columns.ts"
+import { pgTable, text, unique } from "drizzle-orm/pg-core";
+
+import { timestamps } from "../../lib/columns.ts";
+import { resume } from "../resumes/resumes.schema.ts";
+import { user } from "../users/users.schema.ts";
+import { vacancy } from "../vacancies/vacancies.schema.ts";
 
 export const application = pgTable(
   "application",
@@ -20,5 +21,7 @@ export const application = pgTable(
     status: text("status").notNull().default("SUBMITTED"),
     ...timestamps,
   },
-  (table) => [unique("application_user_vacancy").on(table.userId, table.vacancyId)],
-)
+  (table) => [
+    unique("application_user_vacancy").on(table.userId, table.vacancyId),
+  ]
+);

@@ -1,12 +1,18 @@
-import { z } from "@hono/zod-openapi"
+import { z } from "@hono/zod-openapi";
 
 export const vacancyStatusSchema = z
-  .enum(["PENDING_APPROVAL", "APPROVED", "RETURNED_FOR_CORRECTION", "REJECTED", "CLOSED"])
-  .openapi("VacancyStatus")
+  .enum([
+    "PENDING_APPROVAL",
+    "APPROVED",
+    "RETURNED_FOR_CORRECTION",
+    "REJECTED",
+    "CLOSED",
+  ])
+  .openapi("VacancyStatus");
 
 export const vacancyEmploymentTypeSchema = z
   .enum(["FULL_TIME", "PART_TIME", "CONTRACT", "INTERNSHIP"])
-  .openapi("VacancyEmploymentType")
+  .openapi("VacancyEmploymentType");
 
 export const vacancySchema = z
   .object({
@@ -24,7 +30,7 @@ export const vacancySchema = z
     reviewNotes: z.string().nullable(),
     createdAt: z.string(),
   })
-  .openapi("Vacancy")
+  .openapi("Vacancy");
 
 export const createVacancyBodySchema = z
   .object({
@@ -37,9 +43,11 @@ export const createVacancyBodySchema = z
     minAge: z.number().int().min(16).max(80).optional(),
     maxAge: z.number().int().min(16).max(80).optional(),
   })
-  .openapi("CreateVacancyBody")
+  .openapi("CreateVacancyBody");
 
-export const updateVacancyBodySchema = createVacancyBodySchema.partial().openapi("UpdateVacancyBody")
+export const updateVacancyBodySchema = createVacancyBodySchema
+  .partial()
+  .openapi("UpdateVacancyBody");
 
 export const listVacanciesQuerySchema = z
   .object({
@@ -48,10 +56,10 @@ export const listVacanciesQuerySchema = z
     location: z.string().optional(),
     employmentType: vacancyEmploymentTypeSchema.optional(),
   })
-  .openapi("ListVacanciesQuery")
+  .openapi("ListVacanciesQuery");
 
 export const vacancyIdParamSchema = z
   .object({
     id: z.string().min(1),
   })
-  .openapi("VacancyIdParam")
+  .openapi("VacancyIdParam");

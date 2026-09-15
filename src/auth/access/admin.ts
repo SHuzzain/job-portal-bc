@@ -1,17 +1,22 @@
-import { createAccessControl } from "better-auth/plugins/access"
-import { adminAc, defaultStatements, userAc } from "better-auth/plugins/admin/access"
+import { createAccessControl } from "better-auth/plugins/access";
 import {
+  adminAc,
+  defaultStatements,
+  userAc,
+} from "better-auth/plugins/admin/access";
+
+import {
+  type PermissionMap,
   fullPermissions,
   platformResourceStatements,
-  type PermissionMap,
-} from "./catalog.ts"
+} from "./catalog.ts";
 
 export const adminStatements = {
   ...defaultStatements,
   ...platformResourceStatements,
-} as const
+} as const;
 
-export const platformAc = createAccessControl(adminStatements)
+export const platformAc = createAccessControl(adminStatements);
 
 const jobseekerPermissions = {
   seeker_profile: ["view", "update"],
@@ -20,7 +25,7 @@ const jobseekerPermissions = {
   tvet_attendance: ["view", "scan"],
   tvet_certificate: ["view", "submit_survey", "download"],
   notification: ["view", "mark_read"],
-} as const
+} as const;
 
 const employerPermissions = {
   company: ["view", "create", "update", "resubmit"],
@@ -30,7 +35,7 @@ const employerPermissions = {
   org_member: ["view", "invite", "update_role", "remove"],
   org_role: ["view", "create", "update", "delete"],
   notification: ["view", "mark_read"],
-} as const
+} as const;
 
 const trainingProviderPermissions = {
   company: ["view", "update"],
@@ -38,7 +43,7 @@ const trainingProviderPermissions = {
   tvet_session: ["view", "create"],
   tvet_claim: ["view", "create", "upload_signed", "download"],
   notification: ["view", "mark_read"],
-} as const
+} as const;
 
 const adminPermissions = {
   company_review: ["view", "approve", "reject", "return"],
@@ -48,22 +53,22 @@ const adminPermissions = {
   platform_user: ["view", "create", "update", "set_role"],
   platform_role: ["view"],
   notification: ["view", "mark_read"],
-} as const
+} as const;
 
 export const jobseeker = platformAc.newRole({
   ...userAc.statements,
   ...jobseekerPermissions,
-})
+});
 
 export const employer = platformAc.newRole({
   ...userAc.statements,
   ...employerPermissions,
-})
+});
 
 export const admin = platformAc.newRole({
   ...adminAc.statements,
   ...adminPermissions,
-})
+});
 
 export const superAdmin = platformAc.newRole({
   ...adminAc.statements,
@@ -81,14 +86,14 @@ export const superAdmin = platformAc.newRole({
     "update",
   ],
   ...platformResourceStatements,
-})
+});
 
 export const platformRoles = {
   jobseeker,
   employer,
   admin,
   super_admin: superAdmin,
-}
+};
 
 /**
  * Seed permissions for system roles, mirrored by the platform_role table.
@@ -101,6 +106,6 @@ export const SYSTEM_PLATFORM_PERMISSIONS: Record<string, PermissionMap> = {
   training_provider: fullPermissions(trainingProviderPermissions),
   admin: fullPermissions(adminPermissions),
   super_admin: fullPermissions(platformResourceStatements),
-}
+};
 
-export const SYSTEM_PLATFORM_ROLES = Object.keys(SYSTEM_PLATFORM_PERMISSIONS)
+export const SYSTEM_PLATFORM_ROLES = Object.keys(SYSTEM_PLATFORM_PERMISSIONS);

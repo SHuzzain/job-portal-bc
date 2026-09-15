@@ -1,4 +1,5 @@
 import { and, desc, eq, lte, notExists } from "drizzle-orm";
+
 import { organization } from "../../auth/schema.ts";
 import { db } from "../../db/index.ts";
 import { tvetSession } from "../tvet/tvet.schema.ts";
@@ -33,11 +34,11 @@ export function listEligibleCourses(employerId: string, now: string) {
             .where(
               and(
                 eq(tvetClaim.courseId, tvetSession.id),
-                eq(tvetClaim.employerId, employerId),
-              ),
-            ),
-        ),
-      ),
+                eq(tvetClaim.employerId, employerId)
+              )
+            )
+        )
+      )
     )
     .orderBy(desc(tvetSession.endsAt));
 }
@@ -82,7 +83,7 @@ export async function findClaim(id: string) {
 export async function transitionClaim(
   id: string,
   expectedStatus: "SUBMITTED" | "FINANCE_APPROVED" | "SIGNED_DOC_SUBMITTED",
-  data: Partial<typeof tvetClaim.$inferInsert>,
+  data: Partial<typeof tvetClaim.$inferInsert>
 ) {
   const [row] = await db
     .update(tvetClaim)

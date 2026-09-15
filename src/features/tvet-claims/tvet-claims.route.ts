@@ -1,6 +1,7 @@
 import { createRoute, z } from "@hono/zod-openapi";
 import * as HttpStatusCodes from "stoker/http-status-codes";
 import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
+
 import {
   requirePermission,
   requirePermissionFor,
@@ -45,7 +46,7 @@ export const listEligibleCoursesRoute = createRoute({
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
       eligibleCourseSchema.array(),
-      "Completed unclaimed courses",
+      "Completed unclaimed courses"
     ),
     ...errorResponses,
   },
@@ -59,7 +60,7 @@ export const listProviderClaimsRoute = createRoute({
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
       tvetClaimSchema.array(),
-      "Provider claims",
+      "Provider claims"
     ),
     ...errorResponses,
   },
@@ -88,7 +89,7 @@ export const uploadSignedClaimRoute = createRoute({
     params: claimIdParamSchema,
     body: jsonContentRequired(
       uploadSignedClaimBodySchema,
-      "Signed acknowledgement URL",
+      "Signed acknowledgement URL"
     ),
   },
   responses: {
@@ -123,7 +124,7 @@ export const listPasakClaimsRoute = createRoute({
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
       tvetClaimSchema.array(),
-      "All TVET claims",
+      "All TVET claims"
     ),
     ...errorResponses,
   },
@@ -135,7 +136,11 @@ export const reviewClaimRoute = createRoute({
   tags: ["PASAK TVET Claims"],
   middleware: [
     requirePermissionFor("claim_review", (body) =>
-      body.action === "APPROVE" ? "approve" : body.action === "REJECT" ? "reject" : null,
+      body.action === "APPROVE"
+        ? "approve"
+        : body.action === "REJECT"
+          ? "reject"
+          : null
     ),
   ],
   request: {

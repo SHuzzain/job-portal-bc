@@ -1,15 +1,20 @@
-import { z } from "@hono/zod-openapi"
+import { z } from "@hono/zod-openapi";
 
 export const updateUserBodySchema = z
   .object({
-    name: z.string().min(1).max(255).optional().openapi({ example: "Ada Lovelace" }),
+    name: z
+      .string()
+      .min(1)
+      .max(255)
+      .optional()
+      .openapi({ example: "Ada Lovelace" }),
     image: z
       .url()
       .nullable()
       .optional()
       .openapi({ example: "https://example.com/avatar.png" }),
   })
-  .openapi("UpdateUserBody")
+  .openapi("UpdateUserBody");
 
 export const updateUserResponseSchema = z
   .object({
@@ -19,4 +24,4 @@ export const updateUserResponseSchema = z
     image: z.string().nullable(),
     phoneNumber: z.string().nullable(),
   })
-  .openapi("UserProfile")
+  .openapi("UserProfile");

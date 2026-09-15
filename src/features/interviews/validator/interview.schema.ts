@@ -1,10 +1,12 @@
-import { z } from "@hono/zod-openapi"
+import { z } from "@hono/zod-openapi";
 
-export const interviewModeSchema = z.enum(["PHYSICAL", "ONLINE"]).openapi("InterviewMode")
+export const interviewModeSchema = z
+  .enum(["PHYSICAL", "ONLINE"])
+  .openapi("InterviewMode");
 
 export const interviewStatusSchema = z
   .enum(["SCHEDULED", "CONFIRMED", "CANCELLED", "COMPLETED"])
-  .openapi("InterviewStatus")
+  .openapi("InterviewStatus");
 
 export const interviewSchema = z
   .object({
@@ -19,7 +21,7 @@ export const interviewSchema = z
     status: interviewStatusSchema,
     createdAt: z.string(),
   })
-  .openapi("Interview")
+  .openapi("Interview");
 
 export const scheduleInterviewBodySchema = z
   .object({
@@ -31,18 +33,24 @@ export const scheduleInterviewBodySchema = z
     meetingLink: z.url().optional(),
     notes: z.string().max(4000).optional(),
   })
-  .refine((data) => data.mode !== "PHYSICAL" || Boolean(data.location?.trim()), {
-    message: "Location is required for physical interviews",
-    path: ["location"],
-  })
-  .refine((data) => data.mode !== "ONLINE" || Boolean(data.meetingLink?.trim()), {
-    message: "Meeting link is required for online interviews",
-    path: ["meetingLink"],
-  })
-  .openapi("ScheduleInterviewBody")
+  .refine(
+    (data) => data.mode !== "PHYSICAL" || Boolean(data.location?.trim()),
+    {
+      message: "Location is required for physical interviews",
+      path: ["location"],
+    }
+  )
+  .refine(
+    (data) => data.mode !== "ONLINE" || Boolean(data.meetingLink?.trim()),
+    {
+      message: "Meeting link is required for online interviews",
+      path: ["meetingLink"],
+    }
+  )
+  .openapi("ScheduleInterviewBody");
 
 export const applicationIdParamSchema = z
   .object({
     applicationId: z.string().min(1),
   })
-  .openapi("InterviewApplicationIdParam")
+  .openapi("InterviewApplicationIdParam");

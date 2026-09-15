@@ -1,8 +1,11 @@
-import { defineConfig } from "nitro"
+import { defineConfig } from "nitro";
 
 const config = {
   modules: ["workflow/nitro"],
   plugins: ["plugins/start-pg-world.ts"],
+  alias: {
+    "@": "./src",
+  },
   routes: {
     "/**": "./src/app.ts",
   },
@@ -13,6 +16,6 @@ const config = {
   devServer: {
     port: Number(process.env.PORT ?? 3001),
   },
-}
+};
 
-export default defineConfig(config)
+export default defineConfig(config);

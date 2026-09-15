@@ -1,15 +1,21 @@
-import { createRoute } from "@hono/zod-openapi"
-import * as HttpStatusCodes from "stoker/http-status-codes"
-import { jsonContent } from "stoker/openapi/helpers"
-import { requirePermission } from "../../auth/middleware.ts"
-import { createRouter } from "../../lib/create-app.ts"
-import { jsonErrors } from "../../lib/http-errors.ts"
-import { listMine, markAllRead, markRead, unreadCount } from "./notifications.controller.ts"
+import { createRoute } from "@hono/zod-openapi";
+import * as HttpStatusCodes from "stoker/http-status-codes";
+import { jsonContent } from "stoker/openapi/helpers";
+
+import { requirePermission } from "../../auth/middleware.ts";
+import { createRouter } from "../../lib/create-app.ts";
+import { jsonErrors } from "../../lib/http-errors.ts";
+import {
+  listMine,
+  markAllRead,
+  markRead,
+  unreadCount,
+} from "./notifications.controller.ts";
 import {
   notificationIdParamSchema,
   notificationSchema,
   unreadCountSchema,
-} from "./validator/notification.schema.ts"
+} from "./validator/notification.schema.ts";
 
 export const listMineRoute = createRoute({
   method: "get",
@@ -17,10 +23,13 @@ export const listMineRoute = createRoute({
   tags: ["Notifications"],
   middleware: [requirePermission("notification", "view")],
   responses: {
-    [HttpStatusCodes.OK]: jsonContent(notificationSchema.array(), "My notifications"),
+    [HttpStatusCodes.OK]: jsonContent(
+      notificationSchema.array(),
+      "My notifications"
+    ),
     ...jsonErrors(HttpStatusCodes.UNAUTHORIZED, HttpStatusCodes.NOT_FOUND),
   },
-})
+});
 
 export const unreadCountRoute = createRoute({
   method: "get",
@@ -31,7 +40,7 @@ export const unreadCountRoute = createRoute({
     [HttpStatusCodes.OK]: jsonContent(unreadCountSchema, "Unread count"),
     ...jsonErrors(HttpStatusCodes.UNAUTHORIZED, HttpStatusCodes.NOT_FOUND),
   },
-})
+});
 
 export const markReadRoute = createRoute({
   method: "patch",
@@ -45,7 +54,7 @@ export const markReadRoute = createRoute({
     [HttpStatusCodes.OK]: jsonContent(notificationSchema, "Marked read"),
     ...jsonErrors(HttpStatusCodes.UNAUTHORIZED, HttpStatusCodes.NOT_FOUND),
   },
-})
+});
 
 export const markAllReadRoute = createRoute({
   method: "post",
@@ -53,20 +62,23 @@ export const markAllReadRoute = createRoute({
   tags: ["Notifications"],
   middleware: [requirePermission("notification", "mark_read")],
   responses: {
-    [HttpStatusCodes.OK]: jsonContent(notificationSchema.array(), "All marked read"),
+    [HttpStatusCodes.OK]: jsonContent(
+      notificationSchema.array(),
+      "All marked read"
+    ),
     ...jsonErrors(HttpStatusCodes.UNAUTHORIZED, HttpStatusCodes.NOT_FOUND),
   },
-})
+});
 
-export type ListMineRoute = typeof listMineRoute
-export type UnreadCountRoute = typeof unreadCountRoute
-export type MarkReadRoute = typeof markReadRoute
-export type MarkAllReadRoute = typeof markAllReadRoute
+export type ListMineRoute = typeof listMineRoute;
+export type UnreadCountRoute = typeof unreadCountRoute;
+export type MarkReadRoute = typeof markReadRoute;
+export type MarkAllReadRoute = typeof markAllReadRoute;
 
 const notifications = createRouter()
   .openapi(listMineRoute, listMine)
   .openapi(unreadCountRoute, unreadCount)
   .openapi(markAllReadRoute, markAllRead)
-  .openapi(markReadRoute, markRead)
+  .openapi(markReadRoute, markRead);
 
-export default notifications
+export default notifications;

@@ -18,7 +18,7 @@ function printable(value: string) {
 function centeredX(
   text: string,
   font: Awaited<ReturnType<PDFDocument["embedFont"]>>,
-  size: number,
+  size: number
 ) {
   return (842 - font.widthOfTextAtSize(text, size)) / 2;
 }

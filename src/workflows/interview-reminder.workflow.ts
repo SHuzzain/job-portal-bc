@@ -1,67 +1,81 @@
-import { createHook, sleep } from "workflow"
-import * as interviewsService from "../features/interviews/interviews.service.ts"
+import { createHook, sleep } from "workflow";
+
+import * as interviewsService from "../features/interviews/interviews.service.ts";
 
 export type InterviewReminderWorkflowInput = {
-  applicationId: string
-  interviewTime: Date
-  candidatePhone: string
-}
+  applicationId: string;
+  interviewTime: Date;
+  candidatePhone: string;
+};
 
 export type InterviewReply = {
-  response: "confirm" | "decline"
-}
+  response: "confirm" | "decline";
+};
 
-export async function interviewReminderWorkflow(input: InterviewReminderWorkflowInput) {
-  "use workflow"
+export async function interviewReminderWorkflow(
+  input: InterviewReminderWorkflowInput
+) {
+  "use workflow";
 
-  const reminderTime = new Date(input.interviewTime.getTime() - 24 * 60 * 60 * 1000)
-  await sleep(reminderTime)
+  const reminderTime = new Date(
+    input.interviewTime.getTime() - 24 * 60 * 60 * 1000
+  );
+  await sleep(reminderTime);
 
-  const reminderSent = await sendInterviewReminder(input)
+  const reminderSent = await sendInterviewReminder(input);
   if (!reminderSent) {
-    return { status: "interview_not_active" as const }
+    return { status: "interview_not_active" as const };
   }
 
   const hook = createHook<InterviewReply>({
     token: `interview.reply.${input.applicationId}`,
-  })
+  });
 
   try {
-    const conflict = await hook.getConflict()
+    const conflict = await hook.getConflict();
     if (conflict) {
-      return { status: "reply_wait_already_active" as const, runId: conflict.runId }
+      return {
+        status: "reply_wait_already_active" as const,
+        runId: conflict.runId,
+      };
     }
 
     const result = await Promise.race([
       hook.then((reply) => ({ type: "reply" as const, reply })),
       sleep("12h").then(() => ({ type: "timeout" as const })),
-    ])
+    ]);
 
     if (result.type === "timeout") {
-      return { status: "reply_timeout" as const }
+      return { status: "reply_timeout" as const };
     }
 
-    const updated = await recordInterviewReply(input.applicationId, result.reply)
+    const updated = await recordInterviewReply(
+      input.applicationId,
+      result.reply
+    );
     return updated
       ? { status: "reply_recorded" as const }
-      : { status: "interview_not_active" as const }
+      : { status: "interview_not_active" as const };
   } finally {
-    hook.dispose()
+    hook.dispose();
   }
 }
 
 async function sendInterviewReminder(input: InterviewReminderWorkflowInput) {
-  "use step"
+  "use step";
 
   return interviewsService.sendReminder(
     input.applicationId,
     input.interviewTime,
-    input.candidatePhone,
-  )
+    input.candidatePhone
+  );
 }
 
-async function recordInterviewReply(applicationId: string, reply: InterviewReply) {
-  "use step"
+async function recordInterviewReply(
+  applicationId: string,
+  reply: InterviewReply
+) {
+  "use step";
 
-  return interviewsService.applyCandidateReply(applicationId, reply.response)
+  return interviewsService.applyCandidateReply(applicationId, reply.response);
 }

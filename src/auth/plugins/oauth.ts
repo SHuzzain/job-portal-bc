@@ -1,9 +1,10 @@
-import { genericOAuth } from "better-auth/plugins"
-import { env } from "../../env.ts"
+import { genericOAuth } from "better-auth/plugins";
+
+import { env } from "../../env.ts";
 
 export function createGenericOAuthPlugin() {
   if (!env.MYDIGITALID_CLIENT_ID || !env.MYDIGITALID_CLIENT_SECRET) {
-    return null
+    return null;
   }
 
   return genericOAuth({
@@ -12,9 +13,10 @@ export function createGenericOAuthPlugin() {
         providerId: "mydigitalid",
         clientId: env.MYDIGITALID_CLIENT_ID,
         clientSecret: env.MYDIGITALID_CLIENT_SECRET,
-        discoveryUrl: "https://auth.mydigitalid.gov.my/.well-known/openid-configuration",
+        discoveryUrl:
+          "https://auth.mydigitalid.gov.my/.well-known/openid-configuration",
         scopes: ["openid", "profile", "email"],
       },
     ],
-  })
+  });
 }

@@ -1,6 +1,7 @@
-import { pgTable, text, timestamp } from "drizzle-orm/pg-core"
-import { user } from "../features/users/users.schema.ts"
-import { timestamps } from "../lib/columns.ts"
+import { pgTable, text, timestamp } from "drizzle-orm/pg-core";
+
+import { user } from "../features/users/users.schema.ts";
+import { timestamps } from "../lib/columns.ts";
 
 export const session = pgTable("session", {
   id: text("id").primaryKey(),
@@ -14,7 +15,7 @@ export const session = pgTable("session", {
   activeOrganizationId: text("active_organization_id"),
   impersonatedBy: text("impersonated_by"),
   ...timestamps,
-})
+});
 
 export const account = pgTable("account", {
   id: text("id").primaryKey(),
@@ -26,12 +27,16 @@ export const account = pgTable("account", {
   accessToken: text("access_token"),
   refreshToken: text("refresh_token"),
   idToken: text("id_token"),
-  accessTokenExpiresAt: timestamp("access_token_expires_at", { withTimezone: true }),
-  refreshTokenExpiresAt: timestamp("refresh_token_expires_at", { withTimezone: true }),
+  accessTokenExpiresAt: timestamp("access_token_expires_at", {
+    withTimezone: true,
+  }),
+  refreshTokenExpiresAt: timestamp("refresh_token_expires_at", {
+    withTimezone: true,
+  }),
   scope: text("scope"),
   password: text("password"),
   ...timestamps,
-})
+});
 
 export const verification = pgTable("verification", {
   id: text("id").primaryKey(),
@@ -39,7 +44,7 @@ export const verification = pgTable("verification", {
   value: text("value").notNull(),
   expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
   ...timestamps,
-})
+});
 
 export const organization = pgTable("organization", {
   id: text("id").primaryKey(),
@@ -58,8 +63,10 @@ export const organization = pgTable("organization", {
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .$defaultFn(() => new Date()),
-  updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(() => new Date()),
-})
+  updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
+    () => new Date()
+  ),
+});
 
 export const member = pgTable("member", {
   id: text("id").primaryKey(),
@@ -73,7 +80,7 @@ export const member = pgTable("member", {
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .$defaultFn(() => new Date()),
-})
+});
 
 export const invitation = pgTable("invitation", {
   id: text("id").primaryKey(),
@@ -90,7 +97,7 @@ export const invitation = pgTable("invitation", {
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .$defaultFn(() => new Date()),
-})
+});
 
 export const organizationRole = pgTable("organization_role", {
   id: text("id").primaryKey(),
@@ -102,6 +109,7 @@ export const organizationRole = pgTable("organization_role", {
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .$defaultFn(() => new Date()),
-  updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(() => new Date()),
-})
-
+  updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
+    () => new Date()
+  ),
+});

@@ -1,30 +1,31 @@
-import { createRoute } from "@hono/zod-openapi"
-import * as HttpStatusCodes from "stoker/http-status-codes"
-import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers"
+import { createRoute } from "@hono/zod-openapi";
+import * as HttpStatusCodes from "stoker/http-status-codes";
+import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
+
 import {
   requireActiveCompany,
   requireCompanyPermission,
   requirePermission,
-} from "../../auth/middleware.ts"
-import { createRouter } from "../../lib/create-app.ts"
-import { errorResponses, jsonErrors } from "../../lib/http-errors.ts"
+} from "../../auth/middleware.ts";
+import { createRouter } from "../../lib/create-app.ts";
+import { errorResponses, jsonErrors } from "../../lib/http-errors.ts";
 import {
   create as createVacancy,
   deleteVacancy,
-  get as getVacancy,
   getMine as getMineVacancy,
+  get as getVacancy,
   listMine as listMineVacancies,
   listPublic as listPublicVacancies,
   resubmit as resubmitVacancy,
   update as updateVacancy,
-} from "./vacancies.controller.ts"
+} from "./vacancies.controller.ts";
 import {
   createVacancyBodySchema,
   listVacanciesQuerySchema,
   updateVacancyBodySchema,
   vacancyIdParamSchema,
   vacancySchema,
-} from "./validator/vacancy.schema.ts"
+} from "./validator/vacancy.schema.ts";
 
 export const listPublicVacanciesRoute = createRoute({
   method: "get",
@@ -34,9 +35,12 @@ export const listPublicVacanciesRoute = createRoute({
     query: listVacanciesQuerySchema,
   },
   responses: {
-    [HttpStatusCodes.OK]: jsonContent(vacancySchema.array(), "Approved vacancies"),
+    [HttpStatusCodes.OK]: jsonContent(
+      vacancySchema.array(),
+      "Approved vacancies"
+    ),
   },
-})
+});
 
 export const listMineVacanciesRoute = createRoute({
   method: "get",
@@ -44,10 +48,13 @@ export const listMineVacanciesRoute = createRoute({
   tags: ["Vacancies"],
   middleware: [requireActiveCompany, requirePermission("vacancy", "view")],
   responses: {
-    [HttpStatusCodes.OK]: jsonContent(vacancySchema.array(), "Vacancies for the active company"),
+    [HttpStatusCodes.OK]: jsonContent(
+      vacancySchema.array(),
+      "Vacancies for the active company"
+    ),
     ...jsonErrors(HttpStatusCodes.BAD_REQUEST, HttpStatusCodes.UNAUTHORIZED),
   },
-})
+});
 
 export const getVacancyRoute = createRoute({
   method: "get",
@@ -60,7 +67,7 @@ export const getVacancyRoute = createRoute({
     [HttpStatusCodes.OK]: jsonContent(vacancySchema, "Approved vacancy"),
     ...jsonErrors(HttpStatusCodes.NOT_FOUND),
   },
-})
+});
 
 export const createVacancyRoute = createRoute({
   method: "post",
@@ -71,14 +78,17 @@ export const createVacancyRoute = createRoute({
     body: jsonContentRequired(createVacancyBodySchema, "Vacancy"),
   },
   responses: {
-    [HttpStatusCodes.CREATED]: jsonContent(vacancySchema, "Vacancy submitted for PASAK approval"),
+    [HttpStatusCodes.CREATED]: jsonContent(
+      vacancySchema,
+      "Vacancy submitted for PASAK approval"
+    ),
     ...jsonErrors(
       HttpStatusCodes.BAD_REQUEST,
       HttpStatusCodes.UNAUTHORIZED,
-      HttpStatusCodes.FORBIDDEN,
+      HttpStatusCodes.FORBIDDEN
     ),
   },
-})
+});
 
 export const updateVacancyRoute = createRoute({
   method: "patch",
@@ -93,7 +103,7 @@ export const updateVacancyRoute = createRoute({
     [HttpStatusCodes.OK]: jsonContent(vacancySchema, "Updated vacancy"),
     ...errorResponses,
   },
-})
+});
 
 export const getMineVacancyRoute = createRoute({
   method: "get",
@@ -104,14 +114,17 @@ export const getMineVacancyRoute = createRoute({
     params: vacancyIdParamSchema,
   },
   responses: {
-    [HttpStatusCodes.OK]: jsonContent(vacancySchema, "Vacancy owned by the active company"),
+    [HttpStatusCodes.OK]: jsonContent(
+      vacancySchema,
+      "Vacancy owned by the active company"
+    ),
     ...jsonErrors(
       HttpStatusCodes.BAD_REQUEST,
       HttpStatusCodes.UNAUTHORIZED,
-      HttpStatusCodes.NOT_FOUND,
+      HttpStatusCodes.NOT_FOUND
     ),
   },
-})
+});
 
 export const resubmitVacancyRoute = createRoute({
   method: "post",
@@ -122,10 +135,13 @@ export const resubmitVacancyRoute = createRoute({
     params: vacancyIdParamSchema,
   },
   responses: {
-    [HttpStatusCodes.OK]: jsonContent(vacancySchema, "Vacancy resubmitted for PASAK review"),
+    [HttpStatusCodes.OK]: jsonContent(
+      vacancySchema,
+      "Vacancy resubmitted for PASAK review"
+    ),
     ...errorResponses,
   },
-})
+});
 
 export const deleteVacancyRoute = createRoute({
   method: "delete",
@@ -142,19 +158,19 @@ export const deleteVacancyRoute = createRoute({
     ...jsonErrors(
       HttpStatusCodes.UNAUTHORIZED,
       HttpStatusCodes.FORBIDDEN,
-      HttpStatusCodes.NOT_FOUND,
+      HttpStatusCodes.NOT_FOUND
     ),
   },
-})
+});
 
-export type ListPublicVacanciesRoute = typeof listPublicVacanciesRoute
-export type ListMineVacanciesRoute = typeof listMineVacanciesRoute
-export type GetVacancyRoute = typeof getVacancyRoute
-export type CreateVacancyRoute = typeof createVacancyRoute
-export type UpdateVacancyRoute = typeof updateVacancyRoute
-export type GetMineVacancyRoute = typeof getMineVacancyRoute
-export type ResubmitVacancyRoute = typeof resubmitVacancyRoute
-export type DeleteVacancyRoute = typeof deleteVacancyRoute
+export type ListPublicVacanciesRoute = typeof listPublicVacanciesRoute;
+export type ListMineVacanciesRoute = typeof listMineVacanciesRoute;
+export type GetVacancyRoute = typeof getVacancyRoute;
+export type CreateVacancyRoute = typeof createVacancyRoute;
+export type UpdateVacancyRoute = typeof updateVacancyRoute;
+export type GetMineVacancyRoute = typeof getMineVacancyRoute;
+export type ResubmitVacancyRoute = typeof resubmitVacancyRoute;
+export type DeleteVacancyRoute = typeof deleteVacancyRoute;
 
 const vacancies = createRouter()
   .openapi(listPublicVacanciesRoute, listPublicVacancies)
@@ -164,6 +180,6 @@ const vacancies = createRouter()
   .openapi(resubmitVacancyRoute, resubmitVacancy)
   .openapi(getVacancyRoute, getVacancy)
   .openapi(updateVacancyRoute, updateVacancy)
-  .openapi(deleteVacancyRoute, deleteVacancy)
+  .openapi(deleteVacancyRoute, deleteVacancy);
 
-export default vacancies
+export default vacancies;

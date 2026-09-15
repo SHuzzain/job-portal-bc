@@ -1,4 +1,5 @@
 import * as HttpStatusCodes from "stoker/http-status-codes";
+
 import { organizationId } from "../../lib/session.ts";
 import type { AppRouteHandler } from "../../lib/types.ts";
 import type {
@@ -25,7 +26,7 @@ export const listEligibleCourses: AppRouteHandler<
 > = async (c) =>
   c.json(
     await service.listEligibleCourses(organizationId(c)),
-    HttpStatusCodes.OK,
+    HttpStatusCodes.OK
   );
 
 export const listProviderClaims: AppRouteHandler<
@@ -33,14 +34,14 @@ export const listProviderClaims: AppRouteHandler<
 > = async (c) =>
   c.json(
     await service.listProviderClaims(organizationId(c)),
-    HttpStatusCodes.OK,
+    HttpStatusCodes.OK
   );
 
 export const submitClaim: AppRouteHandler<SubmitClaimRoute> = async (c) => {
   try {
     return c.json(
       await service.submitClaim(organizationId(c), c.req.valid("json")),
-      HttpStatusCodes.CREATED,
+      HttpStatusCodes.CREATED
     );
   } catch (error) {
     const value = mapped(error);
@@ -56,7 +57,7 @@ export const uploadSignedClaim: AppRouteHandler<
     const { signedBorangAkuanUrl } = c.req.valid("json");
     return c.json(
       await service.uploadSigned(organizationId(c), id, signedBorangAkuanUrl),
-      HttpStatusCodes.OK,
+      HttpStatusCodes.OK
     );
   } catch (error) {
     const value = mapped(error);
@@ -65,7 +66,7 @@ export const uploadSignedClaim: AppRouteHandler<
 };
 
 export const listPasakClaims: AppRouteHandler<ListPasakClaimsRoute> = async (
-  c,
+  c
 ) => c.json(await service.listPasakClaims(), HttpStatusCodes.OK);
 
 export const reviewClaim: AppRouteHandler<ReviewClaimRoute> = async (c) => {
@@ -74,7 +75,7 @@ export const reviewClaim: AppRouteHandler<ReviewClaimRoute> = async (c) => {
     const { action, comments } = c.req.valid("json");
     return c.json(
       await service.reviewClaim(id, action, comments),
-      HttpStatusCodes.OK,
+      HttpStatusCodes.OK
     );
   } catch (error) {
     const value = mapped(error);
@@ -95,7 +96,7 @@ export const finalizeClaim: AppRouteHandler<FinalizeClaimRoute> = async (c) => {
 async function pdfResponse(
   id: string,
   employerId: string,
-  kind: "PAYMENT_VOUCHER" | "BORANG_AKUAN",
+  kind: "PAYMENT_VOUCHER" | "BORANG_AKUAN"
 ) {
   const pdf = await service.downloadDocument(id, kind, employerId);
   const filename =
@@ -119,7 +120,7 @@ export const downloadPaymentVoucher: AppRouteHandler<
     return await pdfResponse(
       c.req.valid("param").id,
       organizationId(c),
-      "PAYMENT_VOUCHER",
+      "PAYMENT_VOUCHER"
     );
   } catch (error) {
     const value = mapped(error);
@@ -134,7 +135,7 @@ export const downloadBorangAkuan: AppRouteHandler<
     return await pdfResponse(
       c.req.valid("param").id,
       organizationId(c),
-      "BORANG_AKUAN",
+      "BORANG_AKUAN"
     );
   } catch (error) {
     const value = mapped(error);

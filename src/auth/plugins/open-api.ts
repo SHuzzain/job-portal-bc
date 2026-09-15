@@ -1,3 +1,3 @@
-import { openAPI } from "better-auth/plugins"
+import { openAPI } from "better-auth/plugins";
 
-export const openApiPlugin = openAPI()
+export const openApiPlugin = openAPI();

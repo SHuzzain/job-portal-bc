@@ -1,6 +1,7 @@
-import { desc, eq } from "drizzle-orm"
-import { db } from "../../db/index.ts"
-import { user } from "../../db/schema.ts"
+import { desc, eq } from "drizzle-orm";
+
+import { db } from "../../db/index.ts";
+import { user } from "../../db/schema.ts";
 
 const columns = {
   id: user.id,
@@ -11,20 +12,28 @@ const columns = {
   hasTvetCapability: user.hasTvetCapability,
   banned: user.banned,
   createdAt: user.createdAt,
-}
+};
 
 export async function listUsers() {
-  return db.select(columns).from(user).orderBy(desc(user.createdAt))
+  return db.select(columns).from(user).orderBy(desc(user.createdAt));
 }
 
 export async function findUserById(id: string) {
-  const [row] = await db.select(columns).from(user).where(eq(user.id, id)).limit(1)
-  return row ?? null
+  const [row] = await db
+    .select(columns)
+    .from(user)
+    .where(eq(user.id, id))
+    .limit(1);
+  return row ?? null;
 }
 
 export async function findUserByEmail(email: string) {
-  const [row] = await db.select(columns).from(user).where(eq(user.email, email)).limit(1)
-  return row ?? null
+  const [row] = await db
+    .select(columns)
+    .from(user)
+    .where(eq(user.email, email))
+    .limit(1);
+  return row ?? null;
 }
 
 export async function updateUserRole(id: string, role: string) {
@@ -32,8 +41,8 @@ export async function updateUserRole(id: string, role: string) {
     .update(user)
     .set({ role })
     .where(eq(user.id, id))
-    .returning(columns)
-  return row ?? null
+    .returning(columns);
+  return row ?? null;
 }
 
 export async function markVerifiedWithRole(email: string, role: string) {
@@ -41,8 +50,8 @@ export async function markVerifiedWithRole(email: string, role: string) {
     .update(user)
     .set({ role, emailVerified: true })
     .where(eq(user.email, email))
-    .returning(columns)
-  return row ?? null
+    .returning(columns);
+  return row ?? null;
 }
 
 export async function setAccountStatus(id: string, accountStatus: string) {
@@ -50,6 +59,6 @@ export async function setAccountStatus(id: string, accountStatus: string) {
     .update(user)
     .set({ accountStatus })
     .where(eq(user.id, id))
-    .returning(columns)
-  return row ?? null
+    .returning(columns);
+  return row ?? null;
 }

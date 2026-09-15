@@ -1,4 +1,5 @@
 import { and, eq, isNull } from "drizzle-orm";
+
 import { organization } from "../../auth/schema.ts";
 import { db } from "../../db/index.ts";
 import { user } from "../users/users.schema.ts";
@@ -95,7 +96,7 @@ export async function findSessionByBarcode(barcode: string) {
 
 export async function listSessionsByOrganization(
   organizationId: string,
-  rfpId?: string,
+  rfpId?: string
 ) {
   if (rfpId) {
     return db
@@ -104,8 +105,8 @@ export async function listSessionsByOrganization(
       .where(
         and(
           eq(tvetSession.organizationId, organizationId),
-          eq(tvetSession.rfpId, rfpId),
-        ),
+          eq(tvetSession.rfpId, rfpId)
+        )
       );
   }
   return db
@@ -126,8 +127,8 @@ export async function findAttendance(sessionId: string, userId: string) {
     .where(
       and(
         eq(tvetAttendance.sessionId, sessionId),
-        eq(tvetAttendance.userId, userId),
-      ),
+        eq(tvetAttendance.userId, userId)
+      )
     )
     .limit(1);
   return row ?? null;
@@ -136,7 +137,7 @@ export async function findAttendance(sessionId: string, userId: string) {
 export async function completeSurvey(
   sessionId: string,
   userId: string,
-  data: CompleteSurveyRecord,
+  data: CompleteSurveyRecord
 ) {
   const [row] = await db
     .update(tvetAttendance)
@@ -145,8 +146,8 @@ export async function completeSurvey(
       and(
         eq(tvetAttendance.sessionId, sessionId),
         eq(tvetAttendance.userId, userId),
-        isNull(tvetAttendance.surveyCompletedAt),
-      ),
+        isNull(tvetAttendance.surveyCompletedAt)
+      )
     )
     .returning();
   return row ?? null;
@@ -167,8 +168,8 @@ export async function findCertificate(sessionId: string, userId: string) {
     .where(
       and(
         eq(tvetAttendance.sessionId, sessionId),
-        eq(tvetAttendance.userId, userId),
-      ),
+        eq(tvetAttendance.userId, userId)
+      )
     )
     .limit(1);
   return row ?? null;

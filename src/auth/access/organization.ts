@@ -1,21 +1,22 @@
-import { createAccessControl } from "better-auth/plugins/access"
+import { createAccessControl } from "better-auth/plugins/access";
 import {
   adminAc,
   defaultStatements,
   ownerAc,
-} from "better-auth/plugins/organization/access"
+} from "better-auth/plugins/organization/access";
+
 import {
+  type PermissionMap,
   fullPermissions,
   organizationResourceStatements,
-  type PermissionMap,
-} from "./catalog.ts"
+} from "./catalog.ts";
 
 export const organizationStatements = {
   ...defaultStatements,
   ...organizationResourceStatements,
-} as const
+} as const;
 
-export const organizationAc = createAccessControl(organizationStatements)
+export const organizationAc = createAccessControl(organizationStatements);
 
 const adminPermissions = {
   company: ["view", "update", "resubmit"],
@@ -28,7 +29,7 @@ const adminPermissions = {
   org_member: ["view", "invite", "update_role"],
   org_role: ["view"],
   notification: ["view", "mark_read"],
-} as const
+} as const;
 
 const memberPermissions = {
   company: ["view"],
@@ -36,25 +37,25 @@ const memberPermissions = {
   applicant: ["view"],
   interview: ["view"],
   notification: ["view", "mark_read"],
-} as const
+} as const;
 
 export const owner = organizationAc.newRole({
   ...ownerAc.statements,
   ...organizationResourceStatements,
-})
+});
 
 export const admin = organizationAc.newRole({
   ...adminAc.statements,
   ...adminPermissions,
-})
+});
 
 export const organizationRoles = {
   owner,
   admin,
-}
+};
 
 export const BUILTIN_ORG_PERMISSIONS: Record<string, PermissionMap> = {
   owner: fullPermissions(organizationResourceStatements),
   admin: fullPermissions(adminPermissions),
   member: fullPermissions(memberPermissions),
-}
+};

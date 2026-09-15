@@ -1,12 +1,12 @@
 import * as notificationsService from "../notifications/notifications.service.ts";
 import { createCertificatePdf } from "./tvet-certificate.ts";
-import { rfpStatusSchema } from "./validator/tvet.schema.ts";
 import * as tvetRepository from "./tvet.repository.ts";
+import { rfpStatusSchema } from "./validator/tvet.schema.ts";
 
 export class TvetError extends Error {
   constructor(
     public status: 400 | 403 | 404 | 409,
-    message: string,
+    message: string
   ) {
     super(message);
     this.name = "TvetError";
@@ -67,7 +67,7 @@ function toAttendance(
     surveyFeedback: string | null;
     createdAt: Date;
   },
-  sessionTitle: string,
+  sessionTitle: string
 ) {
   return {
     id: row.id,
@@ -98,7 +98,7 @@ export async function listRfps(organizationId: string) {
 
 export async function createRfp(
   organizationId: string,
-  data: { title: string; description: string },
+  data: { title: string; description: string }
 ) {
   const row = await tvetRepository.insertRfp({
     id: crypto.randomUUID(),
@@ -116,7 +116,7 @@ export async function createRfp(
 export async function updateRfp(
   organizationId: string,
   id: string,
-  data: { title?: string; description?: string; status?: "OPEN" | "CLOSED" },
+  data: { title?: string; description?: string; status?: "OPEN" | "CLOSED" }
 ) {
   const existing = await tvetRepository.findRfpById(id);
   if (!existing || existing.organizationId !== organizationId) {
@@ -133,7 +133,7 @@ export async function updateRfp(
 export async function listSessions(organizationId: string, rfpId?: string) {
   const rows = await tvetRepository.listSessionsByOrganization(
     organizationId,
-    rfpId,
+    rfpId
   );
   return rows.map(toSession);
 }
@@ -146,7 +146,7 @@ export async function createSession(
     venue: string;
     startsAt: string;
     endsAt: string;
-  },
+  }
 ) {
   const rfp = await tvetRepository.findRfpById(data.rfpId);
   if (!rfp || rfp.organizationId !== organizationId) {
@@ -240,7 +240,7 @@ export async function listMyAttendance(userId: string) {
 export async function submitSurvey(
   userId: string,
   sessionId: string,
-  data: { rating: number; feedback?: string },
+  data: { rating: number; feedback?: string }
 ) {
   const attendance = await tvetRepository.findAttendance(sessionId, userId);
   if (!attendance) {
@@ -271,7 +271,7 @@ export async function getCertificate(userId: string, sessionId: string) {
   if (!row.attendance.surveyCompletedAt || !row.attendance.certificateCode) {
     throw new TvetError(
       403,
-      "Complete the course survey to unlock your certificate",
+      "Complete the course survey to unlock your certificate"
     );
   }
 

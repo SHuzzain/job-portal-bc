@@ -1,5 +1,6 @@
-import { interviewSchema } from "../../interviews/validator/interview.schema.ts"
-import { z } from "@hono/zod-openapi"
+import { z } from "@hono/zod-openapi";
+
+import { interviewSchema } from "../../interviews/validator/interview.schema.ts";
 
 export const applicationStatusSchema = z
   .enum([
@@ -12,7 +13,7 @@ export const applicationStatusSchema = z
     "REJECTED",
     "FAILED",
   ])
-  .openapi("ApplicationStatus")
+  .openapi("ApplicationStatus");
 
 export const applicationSchema = z
   .object({
@@ -24,39 +25,39 @@ export const applicationSchema = z
     createdAt: z.string(),
     interview: interviewSchema.nullable(),
   })
-  .openapi("Application")
+  .openapi("Application");
 
 export const createApplicationBodySchema = z
   .object({
     vacancyId: z.string().min(1),
     resumeId: z.string().min(1),
   })
-  .openapi("CreateApplicationBody")
+  .openapi("CreateApplicationBody");
 
 export const vacancyIdParamSchema = z
   .object({
     vacancyId: z.string().min(1),
   })
-  .openapi("ApplicationVacancyIdParam")
+  .openapi("ApplicationVacancyIdParam");
 
 export const applicationIdParamSchema = z
   .object({
     id: z.string().min(1),
   })
-  .openapi("ApplicationIdParam")
+  .openapi("ApplicationIdParam");
 
 export const employerApplicationStatusSchema = z
   .enum(["SHORTLISTED", "INTERVIEW_COMPLETED", "REJECTED", "HIRED", "FAILED"])
-  .openapi("ApplicationWorkflowStatus")
+  .openapi("ApplicationWorkflowStatus");
 
 export const setApplicationStatusBodySchema = z
   .object({
     status: employerApplicationStatusSchema,
   })
-  .openapi("SetApplicationStatusBody")
+  .openapi("SetApplicationStatusBody");
 
 export const staleSweepResultSchema = z
   .object({
     marked: z.number().int(),
   })
-  .openapi("StaleSweepResult")
+  .openapi("StaleSweepResult");

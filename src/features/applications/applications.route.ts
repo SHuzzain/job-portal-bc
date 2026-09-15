@@ -1,22 +1,15 @@
-import { createRoute } from "@hono/zod-openapi"
-import * as HttpStatusCodes from "stoker/http-status-codes"
-import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers"
+import { createRoute } from "@hono/zod-openapi";
+import * as HttpStatusCodes from "stoker/http-status-codes";
+import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
+
 import {
   requireApprovedCompany,
   requireCompanyPermission,
   requirePermission,
   requirePermissionFor,
-} from "../../auth/middleware.ts"
-
-const applicantActions: Record<string, string> = {
-  SHORTLISTED: "shortlist",
-  INTERVIEW_COMPLETED: "shortlist",
-  REJECTED: "reject",
-  FAILED: "reject",
-  HIRED: "hire",
-}
-import { createRouter } from "../../lib/create-app.ts"
-import { errorResponses } from "../../lib/http-errors.ts"
+} from "../../auth/middleware.ts";
+import { createRouter } from "../../lib/create-app.ts";
+import { errorResponses } from "../../lib/http-errors.ts";
 import {
   create as createApplication,
   followUp,
@@ -24,14 +17,22 @@ import {
   listForVacancy,
   listMine,
   setStatus,
-} from "./applications.controller.ts"
+} from "./applications.controller.ts";
 import {
   applicationIdParamSchema,
   applicationSchema,
   createApplicationBodySchema,
   setApplicationStatusBodySchema,
   vacancyIdParamSchema,
-} from "./validator/application.schema.ts"
+} from "./validator/application.schema.ts";
+
+const applicantActions: Record<string, string> = {
+  SHORTLISTED: "shortlist",
+  INTERVIEW_COMPLETED: "shortlist",
+  REJECTED: "reject",
+  FAILED: "reject",
+  HIRED: "hire",
+};
 
 export const createApplicationRoute = createRoute({
   method: "post",
@@ -42,10 +43,13 @@ export const createApplicationRoute = createRoute({
     body: jsonContentRequired(createApplicationBodySchema, "Application"),
   },
   responses: {
-    [HttpStatusCodes.CREATED]: jsonContent(applicationSchema, "Application submitted"),
+    [HttpStatusCodes.CREATED]: jsonContent(
+      applicationSchema,
+      "Application submitted"
+    ),
     ...errorResponses,
   },
-})
+});
 
 export const listMineRoute = createRoute({
   method: "get",
@@ -53,10 +57,13 @@ export const listMineRoute = createRoute({
   tags: ["Applications"],
   middleware: [requirePermission("seeker_application", "view")],
   responses: {
-    [HttpStatusCodes.OK]: jsonContent(applicationSchema.array(), "My applications"),
+    [HttpStatusCodes.OK]: jsonContent(
+      applicationSchema.array(),
+      "My applications"
+    ),
     ...errorResponses,
   },
-})
+});
 
 export const listForVacancyRoute = createRoute({
   method: "get",
@@ -67,10 +74,13 @@ export const listForVacancyRoute = createRoute({
     params: vacancyIdParamSchema,
   },
   responses: {
-    [HttpStatusCodes.OK]: jsonContent(applicationSchema.array(), "Applicants for a company vacancy"),
+    [HttpStatusCodes.OK]: jsonContent(
+      applicationSchema.array(),
+      "Applicants for a company vacancy"
+    ),
     ...errorResponses,
   },
-})
+});
 
 export const getApplicationRoute = createRoute({
   method: "get",
@@ -83,7 +93,7 @@ export const getApplicationRoute = createRoute({
     [HttpStatusCodes.OK]: jsonContent(applicationSchema, "Application"),
     ...errorResponses,
   },
-})
+});
 
 export const setStatusRoute = createRoute({
   method: "patch",
@@ -92,18 +102,23 @@ export const setStatusRoute = createRoute({
   middleware: [
     requireApprovedCompany,
     requirePermissionFor("applicant", (body) =>
-      typeof body.status === "string" ? (applicantActions[body.status] ?? null) : null,
+      typeof body.status === "string"
+        ? (applicantActions[body.status] ?? null)
+        : null
     ),
   ],
   request: {
     params: applicationIdParamSchema,
-    body: jsonContentRequired(setApplicationStatusBodySchema, "Application status"),
+    body: jsonContentRequired(
+      setApplicationStatusBodySchema,
+      "Application status"
+    ),
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(applicationSchema, "Updated application"),
     ...errorResponses,
   },
-})
+});
 
 export const followUpRoute = createRoute({
   method: "post",
@@ -117,14 +132,14 @@ export const followUpRoute = createRoute({
     [HttpStatusCodes.OK]: jsonContent(applicationSchema, "Follow-up sent"),
     ...errorResponses,
   },
-})
+});
 
-export type CreateApplicationRoute = typeof createApplicationRoute
-export type ListMineRoute = typeof listMineRoute
-export type ListForVacancyRoute = typeof listForVacancyRoute
-export type GetApplicationRoute = typeof getApplicationRoute
-export type SetStatusRoute = typeof setStatusRoute
-export type FollowUpRoute = typeof followUpRoute
+export type CreateApplicationRoute = typeof createApplicationRoute;
+export type ListMineRoute = typeof listMineRoute;
+export type ListForVacancyRoute = typeof listForVacancyRoute;
+export type GetApplicationRoute = typeof getApplicationRoute;
+export type SetStatusRoute = typeof setStatusRoute;
+export type FollowUpRoute = typeof followUpRoute;
 
 const applications = createRouter()
   .openapi(createApplicationRoute, createApplication)
@@ -132,6 +147,6 @@ const applications = createRouter()
   .openapi(listForVacancyRoute, listForVacancy)
   .openapi(followUpRoute, followUp)
   .openapi(getApplicationRoute, getApplication)
-  .openapi(setStatusRoute, setStatus)
+  .openapi(setStatusRoute, setStatus);
 
-export default applications
+export default applications;

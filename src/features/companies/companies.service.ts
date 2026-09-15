@@ -1,30 +1,30 @@
-import * as notificationsService from "../notifications/notifications.service.ts"
-import * as pasakRepository from "../pasak/pasak.repository.ts"
-import { companyStatusSchema } from "../pasak/validator/pasak.schema.ts"
-import * as companiesRepository from "./companies.repository.ts"
+import * as notificationsService from "../notifications/notifications.service.ts";
+import * as pasakRepository from "../pasak/pasak.repository.ts";
+import { companyStatusSchema } from "../pasak/validator/pasak.schema.ts";
+import * as companiesRepository from "./companies.repository.ts";
 
 export class CompanyError extends Error {
   constructor(
     public status: 403 | 404,
-    message: string,
+    message: string
   ) {
-    super(message)
-    this.name = "CompanyError"
+    super(message);
+    this.name = "CompanyError";
   }
 }
 
 function toCompany(row: {
-  id: string
-  name: string
-  slug: string
-  status: string
-  ssmNumber: string | null
-  ssmDocumentUrl: string | null
-  legalName: string | null
-  industry: string | null
-  website: string | null
-  address: string | null
-  reviewNotes?: string | null
+  id: string;
+  name: string;
+  slug: string;
+  status: string;
+  ssmNumber: string | null;
+  ssmDocumentUrl: string | null;
+  legalName: string | null;
+  industry: string | null;
+  website: string | null;
+  address: string | null;
+  reviewNotes?: string | null;
 }) {
   return {
     id: row.id,
@@ -38,31 +38,34 @@ function toCompany(row: {
     website: row.website,
     address: row.address,
     reviewNotes: row.reviewNotes ?? null,
-  }
+  };
 }
 
-const resubmittable = new Set(["RETURNED_FOR_CORRECTION", "REJECTED"])
+const resubmittable = new Set(["RETURNED_FOR_CORRECTION", "REJECTED"]);
 
 export async function resubmitOwnCompany(userId: string, id: string) {
-  const membership = await companiesRepository.findMembership(id, userId)
+  const membership = await companiesRepository.findMembership(id, userId);
   if (!membership) {
-    throw new CompanyError(404, "Company not found")
+    throw new CompanyError(404, "Company not found");
   }
 
-  const existing = await pasakRepository.findCompanyById(id)
+  const existing = await pasakRepository.findCompanyById(id);
   if (!existing) {
-    throw new CompanyError(404, "Company not found")
+    throw new CompanyError(404, "Company not found");
   }
   if (!resubmittable.has(existing.status)) {
-    throw new CompanyError(403, "Only returned or rejected companies can be resubmitted")
+    throw new CompanyError(
+      403,
+      "Only returned or rejected companies can be resubmitted"
+    );
   }
 
   const row = await pasakRepository.updateCompany(id, {
     status: "PENDING_APPROVAL",
     reviewNotes: null,
-  })
+  });
   if (!row) {
-    throw new CompanyError(404, "Company not found")
+    throw new CompanyError(404, "Company not found");
   }
 
   await notificationsService.notifyAdmins({
@@ -72,7 +75,7 @@ export async function resubmitOwnCompany(userId: string, id: string) {
     href: "/pasak/companies",
     entityType: "company",
     entityId: row.id,
-  })
+  });
 
-  return toCompany(row)
+  return toCompany(row);
 }

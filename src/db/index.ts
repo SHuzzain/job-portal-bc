@@ -1,16 +1,17 @@
-import { drizzle } from "drizzle-orm/node-postgres"
-import { Pool } from "pg"
-import { env } from "../env.ts"
-import * as relations from "./relations/index.ts"
-import * as schema from "./schema.ts"
+import { drizzle } from "drizzle-orm/node-postgres";
+import { Pool } from "pg";
+
+import { env } from "../env.ts";
+import * as relations from "./relations/index.ts";
+import * as schema from "./schema.ts";
 
 const pool = new Pool({
   connectionString: env.DATABASE_URL,
-})
+});
 
 export const db = drizzle({
   client: pool,
   schema: { ...schema, ...relations },
-})
+});
 
-export type Database = typeof db
+export type Database = typeof db;

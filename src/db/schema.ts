@@ -1,16 +1,20 @@
-export { application } from "../features/applications/applications.schema.ts"
-export { interview } from "../features/interviews/interviews.schema.ts"
-export { notification } from "../features/notifications/notifications.schema.ts"
-export { platformRole } from "../features/platform-roles/platform-roles.schema.ts"
+export { application } from "../features/applications/applications.schema.ts";
+export { interview } from "../features/interviews/interviews.schema.ts";
+export { notification } from "../features/notifications/notifications.schema.ts";
+export { platformRole } from "../features/platform-roles/platform-roles.schema.ts";
 export {
   tvetClaim,
   tvetClaimStatus,
-} from "../features/tvet-claims/tvet-claims.schema.ts"
-export { tvetAttendance, tvetRfp, tvetSession } from "../features/tvet/tvet.schema.ts"
-export { resume } from "../features/resumes/resumes.schema.ts"
-export { seekerProfile } from "../features/seeker-profiles/seeker-profiles.schema.ts"
-export { user } from "../features/users/users.schema.ts"
-export { vacancy } from "../features/vacancies/vacancies.schema.ts"
+} from "../features/tvet-claims/tvet-claims.schema.ts";
+export {
+  tvetAttendance,
+  tvetRfp,
+  tvetSession,
+} from "../features/tvet/tvet.schema.ts";
+export { resume } from "../features/resumes/resumes.schema.ts";
+export { seekerProfile } from "../features/seeker-profiles/seeker-profiles.schema.ts";
+export { user } from "../features/users/users.schema.ts";
+export { vacancy } from "../features/vacancies/vacancies.schema.ts";
 export {
   account,
   invitation,
@@ -19,4 +23,4 @@ export {
   organizationRole,
   session,
   verification,
-} from "../auth/schema.ts"
+} from "../auth/schema.ts";

@@ -1,12 +1,15 @@
-import { organization } from "better-auth/plugins"
-import { organizationAc, organizationRoles } from "../access/organization.ts"
+import { organization } from "better-auth/plugins";
 
-const canCreateOrganization = (user: { role?: string | string[] | null } & Record<string, unknown>) => {
-  const roles = Array.isArray(user.role) ? user.role : [user.role]
+import { organizationAc, organizationRoles } from "../access/organization.ts";
+
+const canCreateOrganization = (
+  user: { role?: string | string[] | null } & Record<string, unknown>
+) => {
+  const roles = Array.isArray(user.role) ? user.role : [user.role];
   return roles.some((role) =>
-    role ? ["employer", "admin", "super_admin"].includes(role) : false,
-  )
-}
+    role ? ["employer", "admin", "super_admin"].includes(role) : false
+  );
+};
 
 export const organizationPlugin = organization({
   ac: organizationAc,
@@ -21,7 +24,7 @@ export const organizationPlugin = organization({
       email,
       role,
       organizationId: organization.id,
-    })
+    });
   },
   schema: {
     organization: {
@@ -70,4 +73,4 @@ export const organizationPlugin = organization({
       },
     },
   },
-})
+});

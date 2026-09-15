@@ -1,6 +1,7 @@
-import { date, pgTable, text } from "drizzle-orm/pg-core"
-import { timestamps } from "../../lib/columns.ts"
-import { application } from "../applications/applications.schema.ts"
+import { date, pgTable, text } from "drizzle-orm/pg-core";
+
+import { timestamps } from "../../lib/columns.ts";
+import { application } from "../applications/applications.schema.ts";
 
 export const interview = pgTable("interview", {
   id: text("id").primaryKey(),
@@ -15,4 +16,4 @@ export const interview = pgTable("interview", {
   notes: text("notes"),
   status: text("status").notNull().default("SCHEDULED"),
   ...timestamps,
-})
+});
