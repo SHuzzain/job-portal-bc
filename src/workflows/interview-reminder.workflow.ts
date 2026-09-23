@@ -27,38 +27,31 @@ export async function interviewReminderWorkflow(
     return { status: "interview_not_active" as const };
   }
 
-  const hook = createHook<InterviewReply>({
+  using hook = createHook<InterviewReply>({
     token: `interview.reply.${input.applicationId}`,
   });
 
-  try {
-    const conflict = await hook.getConflict();
-    if (conflict) {
-      return {
-        status: "reply_wait_already_active" as const,
-        runId: conflict.runId,
-      };
-    }
-
-    const result = await Promise.race([
-      hook.then((reply) => ({ type: "reply" as const, reply })),
-      sleep("12h").then(() => ({ type: "timeout" as const })),
-    ]);
-
-    if (result.type === "timeout") {
-      return { status: "reply_timeout" as const };
-    }
-
-    const updated = await recordInterviewReply(
-      input.applicationId,
-      result.reply
-    );
-    return updated
-      ? { status: "reply_recorded" as const }
-      : { status: "interview_not_active" as const };
-  } finally {
-    hook.dispose();
+  const conflict = await hook.getConflict();
+  if (conflict) {
+    return {
+      status: "reply_wait_already_active" as const,
+      runId: conflict.runId,
+    };
   }
+
+  const result = await Promise.race([
+    hook.then((reply) => ({ type: "reply" as const, reply })),
+    sleep("12h").then(() => ({ type: "timeout" as const })),
+  ]);
+
+  if (result.type === "timeout") {
+    return { status: "reply_timeout" as const };
+  }
+
+  const updated = await recordInterviewReply(input.applicationId, result.reply);
+  return updated
+    ? { status: "reply_recorded" as const }
+    : { status: "interview_not_active" as const };
 }
 
 async function sendInterviewReminder(input: InterviewReminderWorkflowInput) {
